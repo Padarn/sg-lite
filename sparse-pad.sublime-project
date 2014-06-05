@@ -1,0 +1,30 @@
+{
+	"folders":
+	[
+		{
+			"follow_symlinks": true,
+			"path": "."
+		}
+	],
+
+	"settings":
+		{
+			"SublimeLinter":
+			{
+				"user":
+				{
+
+					"linters": {
+				            "clang": {
+				                "@disable": true,
+				                "args": [],
+				                "excludes": [],
+				                "extra_flags": "-std=c++11 -stdlib=libstdc++",
+				                "include_dirs": ["/home/padarn/work/sparsepad/Eigen"]
+           							 }
+    							 }
+				}
+
+			}
+		}
+}
