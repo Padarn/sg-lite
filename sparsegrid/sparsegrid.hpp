@@ -13,30 +13,111 @@
 #define SPARSEGRID_HPP
 
 #include "Eigen/Dense"
+#include <vector>
+#include <memory>
 
 /**
 * Typedefs for clarity
 */
 // TODO - Should add a way of compiling with fixed vector length
+// NOTE - Even if this is possible the data vector will change
 typedef Eigen::VectorXd vector;   
-
+typedef Eigen::MatrixXd matrix;  
 
 /**
- * \class subgrid 
- * \brief Defined subgrid element - either an isotropic regular grid
- * or a subspace of a full grid.
+ * \struct regulargrid 
+ * \brief Defined regulargrid element - isotropic regular grid.
  */
-struct subgrid
+typedef struct RegularGrid
 {
 
-	int ndims;
-	bool full;
-	vector level;
-	
+	int ndims_;
+	int size_;
+	vector levels_;
+	vector data_;
+	bool boundary_;
+
+	// Basic Constructor and Destructor
+	RegularGrid(int ndims, vector level, bool boundary);
+	~RegularGrid(){};
+
+	// Initialize the data vector
+	void Initialize();
+
+	// Evaluate data on grid
+	void EvaluateData(const matrix & data);
+
+	// L2 Projection of data (hat functions)
+	void ProjectData();
+
+	// Evaluate
+	matrix EvalPoints(matrix data);
+
+	// Evaluate
+	matrix EvalPointsGrid(int res);
+
+
+} RegularGrid ;
+
+// Typedef a pointer
+typedef std::shared_ptr<RegularGrid> regulargridptr;
+
+/**
+ * \struct regulargrid 
+ * \brief Defined regulargrid element - isotropic regular grid.
+ */
+typedef struct SubGrid : RegularGrid
+{
+
+	// Basic Constructor and Destructor
+	SubGrid(int ndims, vector level, bool boundary):
+			 RegularGrid(ndims, level, boundary) {};
+	~SubGrid(){};
+
+
+} SubGrid ;
+
+/**
+ * \struct combinationgrid
+ * \brief Collection of levels and coefficents. For now will have vector
+ * of pointers to optional RegularGrids.
+ */
+typedef struct CombinationGrid
+{
+
+	std::vector<vector> levels_;
+	std::vector<double> coefs_; // float, int?
+	std::vector<regulargridptr> grids_;
+
+	// ---------------------
+	//     BUILD GRIDS
+	// ---------------------
+
+	void SetupStandardCombinationGrid(int level);
+
+	// ---------------------
+	//   DO STUFF TO GRIDS
+	// ---------------------
+
+	// Evaluate data on grid
+	void EvaluateData(const matrix & data);
+
+	// L2 Projection of data (hat functions)
+	void ProjectData();
+
+	// ---------------------
+	//     EVAL GRIDS
+	// ---------------------
+
+	matrix EvalPoints(matrix data);
+
+	matrix EvalPointsGrid(int res);
+
+} CombinationGrid;
 
 
 
-}subgrid;
+
 
 
 #endif
