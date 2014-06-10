@@ -17,7 +17,7 @@ int main(){
 	int ndim = 2;
 	vector levels(ndim);
 	levels.fill(5);
-	bool full = false;
+	bool full = true;
 
 	RegularGrid a(ndim, levels, full);
 	a.Initialize();
@@ -25,8 +25,20 @@ int main(){
 	a.EvaluateData(data);
 
 	std::ofstream myfile;
-	myfile.open("example.txt");
+	myfile.open("example1.txt");
 	a.ProjectData();
 	myfile << a.EvalPointsGrid(21);
 	myfile.close();
+
+	CombinationGrid b(ndim, full);
+	b.SetupStandardCombinationGrid(4);
+	b.Initialize();
+	b.EvaluateData(data);
+
+	std::ofstream myfile2;
+	myfile2.open("example2.txt");
+	b.ProjectData();
+	myfile2 << b.EvalPointsGrid(21);
+	myfile2.close();
+
 }

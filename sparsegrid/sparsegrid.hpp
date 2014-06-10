@@ -51,10 +51,10 @@ typedef struct RegularGrid
 	void ProjectData();
 
 	// Evaluate
-	matrix EvalPoints(matrix data);
+	vector EvalPoints(matrix data);
 
 	// Evaluate
-	matrix EvalPointsGrid(int res);
+	vector EvalPointsGrid(int res);
 
 
 } RegularGrid ;
@@ -85,13 +85,20 @@ typedef struct SubGrid : RegularGrid
 typedef struct CombinationGrid
 {
 
+	int ndims_;
+	int boundary_;
+
 	std::vector<vector> levels_;
 	std::vector<double> coefs_; // float, int?
 	std::vector<regulargridptr> grids_;
 
+	CombinationGrid(int ndims, bool boundary);
+	~CombinationGrid(){};
 	// ---------------------
 	//     BUILD GRIDS
 	// ---------------------
+
+	void Initialize();
 
 	void SetupStandardCombinationGrid(int level);
 
@@ -109,9 +116,9 @@ typedef struct CombinationGrid
 	//     EVAL GRIDS
 	// ---------------------
 
-	matrix EvalPoints(matrix data);
+	vector EvalPoints(matrix data);
 
-	matrix EvalPointsGrid(int res);
+	vector EvalPointsGrid(int res);
 
 } CombinationGrid;
 

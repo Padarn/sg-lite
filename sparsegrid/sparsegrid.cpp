@@ -166,7 +166,8 @@ vector get_xleft(vector x, vector levels){
 	int n = x.size();
 	vector xleft(n);
 	for(int i = 0; i < n; i++){
-		xleft(i)=pow_int(2,levels(i))*x(i)-floor(pow_int(2,levels(i))*x(i));
+		if (x(i)==1) xleft(i)=1;
+		else xleft(i)=pow_int(2,levels(i))*x(i)-floor(pow_int(2,levels(i))*x(i));
 	}
 	return xleft;
 
@@ -360,7 +361,7 @@ void RegularGrid::ProjectData()
 }
 
 // Calculate value of grid at any point
-matrix RegularGrid::EvalPoints(matrix data)
+vector RegularGrid::EvalPoints(matrix data)
 {
 	
 	vector result(data.rows());
@@ -410,14 +411,14 @@ matrix RegularGrid::EvalPoints(matrix data)
 				result(i) += val*data_(index);
 				increase_2_bit_exd(bit,fixedd);
 			}
-		}
+		} 
 
 	}
 	return result;
 }
 
 // Calculate value of grid at any point
-matrix RegularGrid::EvalPointsGrid(int res)
+vector RegularGrid::EvalPointsGrid(int res)
 {
 	// make grid of data
 	int N = pow(res,ndims_);
@@ -453,4 +454,182 @@ matrix RegularGrid::EvalPointsGrid(int res)
 // -------------------------------------------------------------------------- //
 
 
+// ----------------------- COMBINATIONGRID STRUCT --------------------------- //
+
+int fact(int n)
+{
+	int fn = 1;
+	for(int i = 1;i<=n;i++)
+	{
+		fn = fn * i;
+	}
+	return fn;
+}
+
+int nchoosek(int n, int k){
+	int p1 = fact(n);
+	int p2 = fact(n-k);
+	int p3 = fact(k);
+	int result = p1/(p2*p3);
+	return result;
+}
+
+
+int findnonzero(vector vecin, int num)
+{
+	int n = vecin.size();
+	int found = 0;
+	int i = n-1;
+	while(i>=0)
+	{
+		if (vecin(i)!=0)
+		{
+			found++;
+			if (found == num)
+			{
+				return i;
+			}
+		}
+		i--;
+	}
+	return -1;
+}
+
+void advance_levels(vector & levels)
+{
+	int n = levels.size();
+	if (n==1) return;
+
+	int lastnonzero = findnonzero(levels,1);
+	if (lastnonzero < n-1)
+	{
+		levels(lastnonzero) = levels(lastnonzero)-1;
+		levels(lastnonzero+1) = 1;
+	} else 
+	{
+		int indnonzero = findnonzero(levels,2);
+		int delta = levels(lastnonzero);
+		levels(lastnonzero)=0;
+		int newval = delta + 1;
+		levels(indnonzero) = levels(indnonzero)-1;
+		levels(indnonzero+1) = newval; 
+	}
+}
+
+CombinationGrid::CombinationGrid(int ndims, bool boundary)
+{
+	ndims_ = ndims;
+	boundary_ = boundary;
+}
+
+
+// ---------------------
+//     BUILD GRIDS
+// ---------------------
+
+void CombinationGrid::SetupStandardCombinationGrid(int maxlevel)
+{
+	// NOTE: Does not intialize the grids. Only do this if they
+	// are needed.
+
+	/// NOTE :: CURRENT ASSUMING BOUNDARY
+
+	// TO CHANGE TO NON - BOUNDARY - NEED TO CHANGE LEVELS TO 
+	// START COUNTING AT 1... or just minus 1 to top level and
+	// add one to level?
+
+	int coef;
+	vector level(ndims_);
+	vector ones(ndims_);
+	if (!boundary_) ones.fill(1);
+	else ones.fill(0);
+
+	if(!boundary_) maxlevel--;
+
+	for(int curlvl = maxlevel - ndims_ + 1; curlvl <= maxlevel; curlvl++)
+	{
+		coef = pow(-1,ndims_-curlvl)*nchoosek(ndims_-1,maxlevel-curlvl);
+		level.fill(0);
+		level(0)=curlvl;
+		int n_atlevel = nchoosek(ndims_+curlvl-1,curlvl);
+		//vector newlevel = level+ones; // CHECK IF NEEDED
+		levels_.push_back(level+ones);
+		coefs_.push_back(coef);
+		for(int j=0; j<n_atlevel-1; j++){
+			advance_levels(level);
+			//newlevel = level+ones; // CHECK IF NEEDED
+			levels_.push_back(level+ones);
+			coefs_.push_back(coef);
+		}
+	}
+
+}
+
+void CombinationGrid::Initialize()
+{
+
+	// Go through all levels and make a 'regular grid'
+	for(unsigned int i = 0; i < levels_.size(); i++)
+	{
+		regulargridptr grid(new RegularGrid(ndims_, levels_[i], boundary_));
+		grid->Initialize();
+		grids_.push_back(grid);
+	}
+
+}
+
+// ---------------------
+//   DO STUFF TO GRIDS
+// ---------------------
+
+// Evaluate data on grid
+void CombinationGrid::EvaluateData(const matrix & data)
+{
+	for(unsigned int i = 0; i< grids_.size(); i++)
+	{
+		grids_[i]->EvaluateData(data);
+	}
+}
+
+// L2 Projection of data (hat functions)
+void CombinationGrid::ProjectData()
+{
+	for(unsigned int i = 0; i< grids_.size(); i++)
+	{
+		grids_[i]->ProjectData();
+	}
+}
+
+// ---------------------
+//     EVAL GRIDS
+// ---------------------
+
+vector CombinationGrid::EvalPoints(matrix data)
+{
+	vector result(data.rows());
+	result.fill(0);
+	for(unsigned int i = 0; i< grids_.size(); i++)
+	{
+		vector part = grids_[i]->EvalPoints(data);
+		result = result + coefs_[i]*part;
+	}
+	return result;
+}
+
+vector CombinationGrid::EvalPointsGrid(int res)
+{
+	// TODO MAKE THIS MORE ROBUST
+	vector part = grids_[0]->EvalPointsGrid(res);
+	vector result = coefs_[0]*part;
+	for(unsigned int i = 1; i< grids_.size(); i++)
+	{
+		vector part = grids_[i]->EvalPointsGrid(res);
+		result = result + coefs_[i]*part;
+	}
+	return result;
+}
+
+
+
+// -------------------------------------------------------------------------- //
 
