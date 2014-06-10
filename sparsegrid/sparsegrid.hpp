@@ -53,8 +53,11 @@ typedef struct RegularGrid
 	// Evaluate
 	vector EvalPoints(matrix data);
 
-	// Evaluate
+	// EvaluateGrid
 	vector EvalPointsGrid(int res);
+
+	// Solve heat equation (only 2d)
+	vector HeatSolve(double time);
 
 
 } RegularGrid ;

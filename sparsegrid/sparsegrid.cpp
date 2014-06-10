@@ -227,6 +227,177 @@ void tridiagonal_projection(vector & beta, int index_start, int index_stride,
 	}
 
 }
+// a lower diag, b diag, c upper diag, d rhs
+vector tridiag_solve(vector a, vector b, vector c, vector d)
+{
+	int n = d.size();
+    c(0) /= b(0);
+    d(0) /= b(0);
+
+    for (int i = 1; i < n-1; i++) {
+        c(i) /= b(i) - a(i-1)*c(i-1);
+        d(i) = (d(i) - a(i-1)*d(i-1)) / (b(i) - a(i-1)*c(i-1));
+    }
+
+    d(n-1) = (d(n-1) - a(n-2)*d(n-2)) / (b(n-1) - a(n-2)*c(n-2));
+
+    for (int i = n-1; i >= 0; i--) {
+        d(i) -= c(i)*d(i+1);
+    }
+
+    return d;
+}
+
+// THE FOLLOWING ASSUMES ALL INPUT IS FOR TWO DIMENSIONS!!!
+// implements a one dimensional step along one slice for the 
+// peacman-rachford method.
+// NOTE: Only have neuman (specifically zero) BCs for now.
+vector twod_heat_PR_onestep(vector cursol, vector strides,
+						vector sizes, vector BCs, double r, int size,
+						float dx, float dy, float dt)
+{
+
+	// DIRECTION DEPENDNET R
+	float rx = dt/dx/dx;
+	float ry = dt/dy/dy;
+
+	// BOUNDARYS (x0,y0,x1,y1) in BCs
+
+	// STEP 1 - SET UP VRITUAL QUANTITIES
+	vector virtx0(sizes(1));
+	vector virty0(sizes(0));
+	vector virtx1(sizes(1));
+	vector virty1(sizes(0));
+
+	vector G0(sizes(1));
+	vector G1(sizes(1));
+
+	vector corners(4);
+
+	// NOTE ASSSUME STRIDES(0)=1 
+	
+	// VIRTUALS X
+	virtx0.fill(0); virtx1.fill(0);
+	for(int i = 0; i < virtx0.size(); i++)
+	{
+		virtx0(i)=cursol(1+strides(1)*i) - 2*dx*BCs(0);
+		virtx1(i)=cursol((sizes(0)-2)+strides(1)*i) + 2*dx*BCs(2);
+	} 
+
+	// VIRTUALS Y
+	virty0.fill(0); virty1.fill(0);
+	for(int i = 0; i < virty0.size(); i++)
+	{
+		virty0(i)=cursol(i+strides(1)) - 2*dy*BCs(1);
+		virty1(i)=cursol(i+strides(1)*(sizes(1)-2)) + 2*dy*BCs(3);
+	} 
+
+	// DO CORNERS
+	// float xmym = virty0(1) - 2*dx*BCs(0);
+	// float xmyp = virty1(1) - 2*dx*BCs(0);
+	// float xpym = virty0(sizes(0)-1) + 2*dx*BCs(2);
+	// float xpyp = virty1(sizes(0)-1) + 2*dx*BCs(2);
+
+	// SET UP G
+	for(int i = 0; i < sizes(1); i++)
+	{
+		G0(i) = 0.5*(BCs(0)+BCs(0)) + ry/4*dx/dx*(BCs(0)); // these are short
+		G1(i) = 0.5*(BCs(2)+BCs(2)) + ry/4*dx/dx*(BCs(2)); // need more for bc
+	}
+
+	// STEP 2
+	// do implicit in x - so for each y-stride
+
+	// copy current sol
+	vector ustar(cursol.size());
+	ustar = cursol;
+
+	for(int i = 0; i < sizes(1); i++)
+	{
+		// startindex
+		int startindex = strides(1)*i;
+		// gather vectors for tri-diagonal solve rhs
+		vector rhs(sizes(0));
+		for(int j = 0; j < sizes(0); j++)
+		{
+			if (i==0){
+				// left use virt y0
+				rhs(j) = cursol(startindex+j)+ry/2*(cursol(startindex+j+1) - 2*cursol(startindex+j) + virty0(j));
+			}else if(i==sizes(1)){
+				// right, use virt y1
+				rhs(j) = cursol(startindex+j)+ry/2*(cursol(startindex+j+1) - 2*cursol(startindex+j) + cursol(startindex+j-1));
+			}else{
+				// normal
+				rhs(j) = cursol(startindex+j)+ry/2*(virty0(j) - 2*cursol(startindex+j) + cursol(startindex+j-1));
+			}
+		}
+		rhs(0) = rhs(0) + rx/2*(-2*dx*G0(i));
+		rhs(1) = rhs(1) + rx/2*(2*dx*G1(i));
+
+		// get diags
+		vector a(sizes(0)-1); vector b(sizes(0)); vector c(sizes(0)-1);
+		a.fill(rx/2); c.fill(rx/2);
+		c(sizes(0)-2)=rx;
+		a(0)=rx;
+		b.fill(-rx);
+
+		vector solution = tridiag_solve(a,b,c,rhs);
+
+		for(int j = 0; j < sizes(0); j++){
+			ustar(startindex+j)=solution(j);
+		}
+	}
+
+	// calc boundary ustar
+	vector ustarm(sizes(1));
+	vector ustarp(sizes(1));
+	for(int i = 0; i < sizes(1); i++)
+	{
+		ustarm(i)=ustar(1+strides(1)*i)-2*dx*G0(i);
+		ustarp(i)=ustar(sizes(0)-2+strides(1)*i)+2*dx*G1(i);
+	}
+
+	// STEP 3 second sweep through y dim
+	for(int i = 0; i < sizes(1); i++)
+	{
+		vector rhs(sizes(1));
+		int startindex = i;
+		for(int j = 0; j < sizes(0); j++)
+		{
+			if (i==0){
+				// left use virt y0
+				rhs(j) = ustar(startindex+j*strides(1))+rx/2*(ustar(startindex+(j+1)*strides(1)) - 2*ustar(startindex+j*strides(1)) + ustarm(j));
+			}else if(i==sizes(1)){
+				// right, use virt y1
+				rhs(j) = ustar(startindex+j*strides(1))+rx/2*(ustar(startindex+(1+j)*strides(1)) - 2*ustar(startindex+j*strides(1)) 
+																								+ ustar(startindex+(j-1)*strides(1)));
+			}else{
+				// normal
+				rhs(j) = ustar(startindex+j*strides(1))+rx/2*(ustarp(j) - 2*ustar(startindex+j*strides(1)) + ustar(startindex+(j-1)*strides(1)));
+			}
+		}
+		// boundary
+		rhs(0) = rhs(0) - 2*dy*BCs(1);
+		rhs(sizes(1)) = rhs(sizes(1)) + 2*dy*BCs(3);
+
+		// get diags
+		vector a(sizes(0)-1); vector b(sizes(0)); vector c(sizes(0)-1);
+		a.fill(ry/2); c.fill(ry/2);
+		c(sizes(0)-2)=ry;
+		a(0)=ry;
+		b.fill(-ry);
+
+		vector solution = tridiag_solve(a,b,c,rhs);
+
+		for(int j = 0; j < sizes(1); j++){
+			ustar(startindex+j*strides(1))=solution(j);
+		}
+	}
+
+	return ustar;
+
+}
+
 // -------------------------------------------------------------------------- //
 
 
@@ -439,6 +610,34 @@ vector RegularGrid::EvalPointsGrid(int res)
 	}
 
 	return EvalPoints(grid);
+}
+
+vector RegularGrid::HeatSolve(double time)
+{
+	vector sol;
+	if(ndims_ != 2)
+	{
+		std::cout << "Heat Solve only for 2d." << std::endl;
+		return sol;
+	}
+
+	vector strides = stride_index(levels_, boundary_);
+	vector sizes(ndims_);
+	for( int d=0; d<ndims_; d++){
+		if (boundary_) sizes(d) = pow_int(2,levels_(d))+1;
+		else sizes(d) = pow_int(2,levels_(d))-1;
+	}
+	vector BCs(4);
+	BCs.fill(0);
+	double r = 0;
+	int size = 0;
+	float dx = 1.0/sizes(0);
+	float dy = 1.0/sizes(1);
+	float dt = 0.1;
+
+	sol = twod_heat_PR_onestep(data_, strides, sizes, BCs, r, size,
+						dx, dy, dt);
+	return sol;
 }
 
 // -------------------------------------------------------------------------- //

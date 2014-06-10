@@ -24,21 +24,23 @@ int main(){
 
 	a.EvaluateData(data);
 
-	std::ofstream myfile;
-	myfile.open("example1.txt");
-	a.ProjectData();
-	myfile << a.EvalPointsGrid(21);
-	myfile.close();
+	// std::ofstream myfile;
+	// myfile.open("example1.txt");
+	// a.ProjectData();
+	// myfile << a.EvalPointsGrid(21);
+	// myfile.close();
 
-	CombinationGrid b(ndim, full);
-	b.SetupStandardCombinationGrid(4);
-	b.Initialize();
-	b.EvaluateData(data);
+	// CombinationGrid b(ndim, full);
+	// b.SetupStandardCombinationGrid(4);
+	// b.Initialize();
+	// b.EvaluateData(data);
 
-	std::ofstream myfile2;
-	myfile2.open("example2.txt");
-	b.ProjectData();
-	myfile2 << b.EvalPointsGrid(21);
-	myfile2.close();
+	// std::ofstream myfile2;
+	// myfile2.open("example2.txt");
+	// b.ProjectData();
+	// myfile2 << b.EvalPointsGrid(21);
+	// myfile2.close();
+	double t = 1.0;
+	a.HeatSolve(t);
 
 }
