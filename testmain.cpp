@@ -10,13 +10,14 @@ int main(){
 	//------------------
 	// Reading from file
 	matrix data;
-	data = read_csv_matrix("data.csv");
+	data = read_csv_matrix("data_heat.csv");
 	//-----------------
 
 
 	int ndim = 2;
 	vector levels(ndim);
-	levels.fill(5);
+	levels.fill(7);
+	levels(1)=3;
 	bool full = true;
 
 	RegularGrid a(ndim, levels, full);
@@ -40,7 +41,21 @@ int main(){
 	// b.ProjectData();
 	// myfile2 << b.EvalPointsGrid(21);
 	// myfile2.close();
+	
+
+	std::ofstream myfile2;
+	myfile2.open("example_heat.txt");
+	// b.ProjectData();
+	myfile2 << a.EvalPointsGrid(21);
+	myfile2.close();
+
+	std::ofstream myfile3;
+	myfile3.open("example_heat3.txt");
 	double t = 1.0;
-	a.HeatSolve(t);
+	for (int i =0; i<1;i++){
+		a.HeatSolve(t);
+	}
+	myfile3 << a.EvalPointsGrid(31);
+	myfile3.close();
 
 }
