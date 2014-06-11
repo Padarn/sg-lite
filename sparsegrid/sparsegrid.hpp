@@ -57,7 +57,9 @@ typedef struct RegularGrid
 	vector EvalPointsGrid(int res);
 
 	// Solve heat equation (only 2d)
-	vector HeatSolve(double time);
+	void HeatSolve(double time);
+
+	void CentralStepStart();
 
 
 } RegularGrid ;
@@ -122,6 +124,10 @@ typedef struct CombinationGrid
 	vector EvalPoints(matrix data);
 
 	vector EvalPointsGrid(int res);
+
+	void HeatSolve(double time);
+
+	void CentralStepStart();
 
 } CombinationGrid;
 

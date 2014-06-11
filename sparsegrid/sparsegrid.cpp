@@ -5,6 +5,16 @@
 
 // -------------------------- UTILITIES STRUCT ------------------------------ //
 
+double central_step(vector x)
+{
+	for(int d = 0; d<x.size();d++){
+		if (x(d)<.3 || x(d)>.7) {
+			return 0;
+		}
+	}
+	return 1;
+}
+
 int pow_int(int a,int b){
 	return (int) pow(a, b);
 }
@@ -254,6 +264,22 @@ vector twod_heat_PR_onestep(vector cursol, vector strides,
 	int nx = sizes(0);
 	int ny = sizes(1);
 
+	if (ny < 3 || nx < 3)
+	{
+		// No interior degrees of freedom.
+		return cursol;
+	}
+	// if only one degree, skip the solution in that 
+	// direction
+	bool skipy;
+	bool skipx;
+	if (ny == 3){
+		skipy = true;
+	}
+	if (nx == 3){
+		skipx = true;
+	}
+
 	// DIRECTION DEPENDNET R
 	float rx = sigma*dt/dx/dx;
 	float ry = sigma*dt/dy/dy;
@@ -267,85 +293,86 @@ vector twod_heat_PR_onestep(vector cursol, vector strides,
 	// copy current sol
 	vector ustar(cursol.size());
 	ustar = cursol;
-
-	for(int i = 1; i < ny-1; i++)
-	{
-		// startindex - FOR EACH FIXED Y
-		int startindex = strides(1)*i;
-		// RHS - SIZE-2 OF x LENGTH (NO BOUNDARY)
-		vector rhs(nx-2);
-		rhs.fill(0);
-		for(int j = 0; j < nx-2; j++)
+	if (!skipx){
+		for(int i = 1; i < ny-1; i++)
 		{
-			int centerindex = startindex+strides(0)*(j+1);// j+1 no boundary
-			rhs(j) = rhs(j) + (1-ry) * cursol(centerindex);
-			if (j==0){
-				// LEFT HAND SIDE BC
-				rhs(j) = rhs(j) + ry/2 * (cursol(centerindex+strides(1)));
-			}else if(j==nx-3){
-				// RIGHT HAND SIDE BC
-				rhs(j) = rhs(j) + ry/2 * (cursol(centerindex-strides(1)));
-			}else{
-				// CENTER
-				rhs(j) = rhs(j) + ry/2 * (cursol(centerindex+strides(1))+
-										  cursol(centerindex-strides(1)));
+			// startindex - FOR EACH FIXED Y
+			int startindex = strides(1)*i;
+			// RHS - SIZE-2 OF x LENGTH (NO BOUNDARY)
+			vector rhs(nx-2);
+			rhs.fill(0);
+			for(int j = 0; j < nx-2; j++)
+			{
+				int centerindex = startindex+strides(0)*(j+1);// j+1 no boundary
+				rhs(j) = rhs(j) + (1-ry) * cursol(centerindex);
+				if (j==0){
+					// LEFT HAND SIDE BC
+					rhs(j) = rhs(j) + ry/2 * (cursol(centerindex+strides(1)));
+				}else if(j==nx-3){
+					// RIGHT HAND SIDE BC
+					rhs(j) = rhs(j) + ry/2 * (cursol(centerindex-strides(1)));
+				}else{
+					// CENTER
+					rhs(j) = rhs(j) + ry/2 * (cursol(centerindex+strides(1))+
+											  cursol(centerindex-strides(1)));
+				}
+
 			}
 
-		}
+			// get diags
+			vector a(nx-3); vector b(nx-2); vector c(nx-3);
+			a.fill(-rx/2); c.fill(-rx/2);
+			b.fill(1+rx);
 
-		// get diags
-		vector a(nx-3); vector b(nx-2); vector c(nx-3);
-		a.fill(-rx/2); c.fill(-rx/2);
-		b.fill(1+rx);
+			tridiag_solve(a,b,c,rhs);
 
-		tridiag_solve(a,b,c,rhs);
-
-		for(int j = 0; j < nx-2 ; j++){
-			ustar(startindex+(j+1)*strides(0))=rhs(j);
+			for(int j = 0; j < nx-2 ; j++){
+				ustar(startindex+(j+1)*strides(0))=rhs(j);
+			}
 		}
 	}
 
 	// BOUNADRY IS LEFT ALONE
 
 	// STEP 3 do y directions
-
-	for(int i = 1; i < nx-1; i++)
-	{
-		// startindex - FOR EACH FIXED X
-		int startindex = strides(0)*i;
-		// RHS - SIZE-2 OF y LENGTH (NO BOUNDARY)
-		vector rhs(ny-2);
-		rhs.fill(0);
-		for(int j = 0; j < ny-2; j++)
+	if(!skipy){
+		for(int i = 1; i < nx-1; i++)
 		{
-			int centerindex = startindex+strides(1)*(j+1);// j+1 no boundary
-			rhs(j) = rhs(j) + (1-rx) * ustar(centerindex);
-			if (j==0){
-				// LEFT HAND SIDE BC
-				rhs(j) = rhs(j) + rx/2 * (ustar(centerindex+strides(0)));
-			}else if(j==ny-3){
-				// RIGHT HAND SIDE BC
-				rhs(j) = rhs(j) + rx/2 * (ustar(centerindex-strides(0)));
-			}else{
-				// CENTER
-				rhs(j) = rhs(j) + rx/2 * (ustar(centerindex+strides(0))+
-										  ustar(centerindex-strides(0)));
+			// startindex - FOR EACH FIXED X
+			int startindex = strides(0)*i;
+			// RHS - SIZE-2 OF y LENGTH (NO BOUNDARY)
+			vector rhs(ny-2);
+			rhs.fill(0);
+			for(int j = 0; j < ny-2; j++)
+			{
+				int centerindex = startindex+strides(1)*(j+1);// j+1 no boundary
+				rhs(j) = rhs(j) + (1-rx) * ustar(centerindex);
+				if (j==0){
+					// LEFT HAND SIDE BC
+					rhs(j) = rhs(j) + rx/2 * (ustar(centerindex+strides(0)));
+				}else if(j==ny-3){
+					// RIGHT HAND SIDE BC
+					rhs(j) = rhs(j) + rx/2 * (ustar(centerindex-strides(0)));
+				}else{
+					// CENTER
+					rhs(j) = rhs(j) + rx/2 * (ustar(centerindex+strides(0))+
+											  ustar(centerindex-strides(0)));
+				}
+
 			}
 
-		}
+			// get diags
+			vector a(ny-3); vector b(ny-2); vector c(ny-3);
+			a.fill(-ry/2); c.fill(-ry/2);
+			b.fill(1+ry);
 
-		// get diags
-		vector a(ny-3); vector b(ny-2); vector c(ny-3);
-		a.fill(-ry/2); c.fill(-ry/2);
-		b.fill(1+ry);
+			tridiag_solve(a,b,c,rhs);
 
-		tridiag_solve(a,b,c,rhs);
-
-		for(int j = 0; j < ny-2 ; j++){
-			ustar(startindex+(j+1)*strides(1))=rhs(j);
+			for(int j = 0; j < ny-2 ; j++){
+				ustar(startindex+(j+1)*strides(1))=rhs(j);
+			}
 		}
 	}
-
 
 	return ustar;
 
@@ -385,6 +412,30 @@ void RegularGrid::Initialize()
 
 	data_ = vector(size_);
 	data_.fill(0);
+}
+
+void RegularGrid::CentralStepStart()
+{
+
+	vector strides = stride_index(levels_, boundary_);
+	vector zsize(ndims_);
+	vector h(ndims_);
+	for( int d=0; d<ndims_; d++){
+		if (boundary_) zsize(d) = pow_int(2,levels_(d));
+		else zsize(d) = pow_int(2,levels_(d))-2;
+		h(d)=1.0/pow_int(2,levels_(d));
+	}
+
+	vector bit(ndims_);
+	bit.fill(0);
+
+	for(int i=0; i < size_; i++)
+	{
+		int index = bit.dot(strides);
+		vector x = bit.cwiseProduct(h);
+		data_[index] = central_step(x);
+		if (i<size_-1) increase_bit(bit, zsize);
+	}
 }
 
 // Evaluate data on regular grid hat functions
@@ -565,13 +616,13 @@ vector RegularGrid::EvalPointsGrid(int res)
 	return EvalPoints(grid);
 }
 
-vector RegularGrid::HeatSolve(double time)
+void RegularGrid::HeatSolve(double time)
 {
 	vector sol;
 	if(ndims_ != 2)
 	{
 		std::cout << "Heat Solve only for 2d." << std::endl;
-		return sol;
+		return;
 	}
 
 	vector strides = stride_index(levels_, boundary_);
@@ -589,7 +640,7 @@ vector RegularGrid::HeatSolve(double time)
 	float dt = 0.0001;
 	sol = data_;
 	for(int i=0;i<30;i++){
-	sol = twod_heat_PR_onestep(sol, strides, sizes, BCs, r, size,
+		sol = twod_heat_PR_onestep(sol, strides, sizes, BCs, r, size,
 						dx, dy, dt,0.5);
 	}
 	data_ =  sol;
@@ -783,7 +834,23 @@ vector CombinationGrid::EvalPointsGrid(int res)
 	return result;
 }
 
+void CombinationGrid::HeatSolve(double time)
+{
+	for(unsigned int i = 0; i< grids_.size(); i++)
+	{
+		grids_[i]->HeatSolve(time);
+	}
 
+}
+
+void CombinationGrid::CentralStepStart()
+{
+	for(unsigned int i = 0; i< grids_.size(); i++)
+	{
+		grids_[i]->CentralStepStart();
+	}
+
+}
 
 // -------------------------------------------------------------------------- //
 
