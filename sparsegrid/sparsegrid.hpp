@@ -46,6 +46,7 @@ typedef struct RegularGrid
 
 	// Evaluate data on grid
 	void EvaluateData(const matrix & data);
+	void EvaluateData(std::string data);
 
 	// L2 Projection of data (hat functions)
 	void ProjectData();

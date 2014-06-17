@@ -1,4 +1,5 @@
 #include "sparsegrid.hpp"
+#include "filereading.hpp"
 #include "utils.cpp"
 #include <iostream>
 
@@ -394,6 +395,8 @@ RegularGrid::RegularGrid(int ndims, vector levels, bool boundary)
 
 }
 
+
+
 // Initialize the data array
 void RegularGrid::Initialize()
 {
@@ -436,6 +439,13 @@ void RegularGrid::CentralStepStart()
 		data_[index] = central_step(x);
 		if (i<size_-1) increase_bit(bit, zsize);
 	}
+}
+
+void RegularGrid::EvaluateData(std::string datafile){
+
+	const matrix data = read_csv_matrix(datafile);
+	EvaluateData(data);
+
 }
 
 // Evaluate data on regular grid hat functions
