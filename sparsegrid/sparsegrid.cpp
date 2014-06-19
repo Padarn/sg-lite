@@ -1,3 +1,8 @@
+/* NOTES
+*
+* Useful article on indexing: http://nadeausoftware.com/articles/2012/06/c_c_tip_how_loop_through_multi_dimensional_arrays_quickly
+*/
+
 #include "sparsegrid.hpp"
 #include "filereading.hpp"
 #include "utils.cpp"
@@ -379,25 +384,106 @@ vector twod_heat_PR_onestep(vector cursol, vector strides,
 
 }
 
+// /*
+//   Dehierarchize in one dimension of a d dimensional tensor. This is for a full grid at 
+//   given level to go from hierarchical representation to nodal.
+// */
+// void OneDimDehierarchizeBoundary(vector & data, int stride, int startindex, int level){
+
+// // Start at highest level and move downs
+// 	int size pow_int(2,level)+1;
+
+// 	// highest level does not need changing, coefficient remains 
+// 	// the same, we start on level 2
+// 	int step = size/2; // integer division
+// 	int index;
+// 	int left,right;
+// 	double x;
+
+// 	for(int i=2; i<level; i++){
+// 		step = step/2;
+// 		for(int j=0; j<pow(2,i-1);j++){
+// 			// left and right parents
+// 			index = (1+2*j)*pow(2,i);
+// 			left = index-step;
+// 			right = index+step
+// 			data(index) = data(index)+0.5*(data(left)+data(right));
+			
+			
+// 		}
+// 	}
+// }
+
+// void OneDimDehierarchizeNoBoundary(vector & data, int stride, int startindex, int level){
+
+// // Start at lowest level and move up
+// 	int size = pow_int(2,level)-1;
+// 	int center = size/2;
+// 	int step = (size+1)/2;
+
+// 	//no boundary needs level two handled separately
+// 	if (level<=2){
+// 		step = step/2;
+
+// 	}	
+	
+// 	for(int i=3; i<level; i++){
+// 		step = step/2;
+// 		for(int j=0; j<pow(2,i-1);j++){
+// 			// left and right parents
+// 			index = (1+2*j)*pow(2,i);
+// 			left = index-step;
+// 			right = index+step
+// 			data(index) = data(index)+0.5*(data(left)+data(right));
+			
+			
+// 		}
+// 	}
+// }
+
+// /*
+//   Hierarchize in one dimension of a d dimensional tensor. This is to take a full grid in
+//   nodal representation to a hierarchical representation
+// */ 
+// OneDimHierarchizeBoundary(matrix data, int stride, int startindex, int level, bool boundary){
+
+// // Start at lowest level and move up
+// 	int size = pow_int(2,level)-1;
+// 	int center = size/2;
+// 	int step = (size+1)/2;
+
+// 	//
+
+// 	for(int i=2; i<level; i++){
+// 		step = step/2;
+// 		for(int j=0; j<pow(2,i-1);j++){
+// 			// left and right parents
+// 			index = (1+2*j)*pow(2,i);
+// 			left = index-step;
+// 			right = index+step
+// 			data(index) = data(index)+0.5*(data(left)+data(right));
+			
+			
+// 		}
+// 	}
+
+// [ 0 1 2 3 4 5 6]
+
+// }
+
+
 // -------------------------------------------------------------------------- //
 
 
 // ------------------------- REGULARGRID STRUCT ----------------------------- //
 
-// Constructor
 RegularGrid::RegularGrid(int ndims, vector levels, bool boundary)
 {
-
 	ndims_ = ndims;
 	levels_ = levels;
 	boundary_ = boundary;
-
-
 }
 
-
-
-// Initialize the data array
 void RegularGrid::Initialize()
 {
 	// NOTE: level 0 means boundary
@@ -412,9 +498,9 @@ void RegularGrid::Initialize()
 	{
 		size_ = no_boundary_size(levels_,ndims_);
 	}
-
 	data_ = vector(size_);
 	data_.fill(0);
+	isInitialised_ = true;
 }
 
 void RegularGrid::CentralStepStart()
@@ -509,7 +595,7 @@ void RegularGrid::EvaluateData(const matrix & data)
 }
 
 // Do L2 projection of stored data
-void RegularGrid::ProjectData()
+void RegularGrid::ProjectionDensity()
 {	
 	// Get vector of strides
 	vector strides = stride_index(levels_, boundary_);
@@ -647,11 +733,11 @@ void RegularGrid::HeatSolve(double time)
 	int size = 0;
 	float dx = 1.0/sizes(0);
 	float dy = 1.0/sizes(1);
-	float dt = 0.0001;
+	float dt = 0.001;
 	sol = data_;
-	for(int i=0;i<30;i++){
+	for(int i=0;i<200;i++){
 		sol = twod_heat_PR_onestep(sol, strides, sizes, BCs, r, size,
-						dx, dy, dt,0.5);
+						dx, dy, dt,0);
 	}
 	data_ =  sol;
 }
@@ -811,7 +897,7 @@ void CombinationGrid::ProjectData()
 {
 	for(unsigned int i = 0; i< grids_.size(); i++)
 	{
-		grids_[i]->ProjectData();
+		grids_[i]->ProjectionDensity();
 	}
 }
 

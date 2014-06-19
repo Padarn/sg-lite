@@ -1,4 +1,4 @@
-CC      = g++ -std=c++11 -Wall -g -ggdb -fPIC -shared
+CC      = g++ -std=c++11 -Wall -g -ggdb -fPIC
 CFLAGS  = -I$(CURDIR)
 LDFLAGS = 
 OBJECTS = testmain.o sparsegrid/sparsegrid.o sparsegrid/filereading.o
