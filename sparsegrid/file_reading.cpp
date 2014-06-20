@@ -1,4 +1,4 @@
-#include "filereading.hpp"
+#include "file_reading.hpp"
 
 double fromString( const std::string &s )
 {

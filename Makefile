@@ -1,22 +1,20 @@
-CC      = g++ -std=c++11 -Wall -g -ggdb -fPIC
-CFLAGS  = -I$(CURDIR)
+CC      = 
+CFLAGS  = 
 LDFLAGS = 
-OBJECTS = testmain.o sparsegrid/sparsegrid.o sparsegrid/filereading.o
+OBJECTS = 
 
-main: $(OBJECTS)
-	$(CC) $(OBJECTS) -o test 
+all:  
+	cd sparsegrid; make
+	cd swig; make
 
-testmain.o: testmain.cpp sparsegrid/filereading.hpp 
-	$(CC) -c testmain.cpp $(CFLAGS)
+debug:
+	cd sparsegrid; make debug
+	cd swig; make
 
-sparsegrid/sparsegrid.o: sparsegrid/sparsegrid.cpp sparsegrid/sparsegrid.hpp
-	cd sparsegrid; make sparsegrid.o;
-
-sparsegrid/filereading.o: sparsegrid/filereading.cpp sparsegrid/filereading.hpp
-	cd sparsegrid; make filereading.o;
-
-.PHONY: clean
+release:
+	cd sparsegrid; make release
+	cd swig; make
 
 clean:
-	rm *.o
-	rm test
+	cd sparsegrid; make clean
+	cd swig; make clean

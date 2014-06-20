@@ -1,16 +1,30 @@
-CC      = g++ -std=c++11 -Wall -g -ggdb -fPIC -shared
-CFLAGS  = -I$(CURDIR)/../
-LDFLAGS = 
+CC      = g++ -std=c++11 -stdlib=libstdc++ -Wall 
+DEBUG   =  -g -ggdb
+RELEASE = -O2
+INCLUDE = -I$(CURDIR)/../ -I$(CURDIR)
+CFLAGS  = -fPIC
+LDFLAGS =  -shared
+SRCS = $(wildcard *.cpp)
+HEADERS = $(patsubst %.cpp,%.hpp,$(SRCS))
+OBJS = $(patsubst %.cpp,%.o,$(SRCS))
+TARGETLIB = libsg-lite.so
 
-all: sparsegrid.o filereading.o
+all: ${TARGETLIB}
 
-sparsegrid.o: sparsegrid.cpp sparsegrid.hpp
-	$(CC) -c $(CFLAGS) sparsegrid.cpp
+debug: 
+	export FLAGS=$(DEBUG); make all 
 
-filereading.o: filereading.cpp filereading.hpp
-	$(CC) -c $(CFLAGS) filereading.cpp
+release: 
+	export FLAGS=$(RELEASE); make all
+
+$(TARGETLIB): $(OBJS)
+	$(CC) -o $@ $(LDFLAGS) $^
+
+%.o: %.cpp %.hpp
+	$(CC) $(FLAGS) $(CFLAGS) $(INCLUDE) -c $< >$@
 
 .PHONY: clean
 
 clean:
 	rm *.o
+	rm *.so

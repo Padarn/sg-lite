@@ -13,8 +13,8 @@
 #include <Eigen/Core>
 #include <Python.h>
 #include <numpy/arrayobject.h>
-#include "sparsegrid/sparsegrid.hpp"
-#include "sparsegrid/filereading.hpp"
+#include "sparsegrid/regular_grid.hpp"
+#include "sparsegrid/file_reading.hpp"
 #include <string>
 #include <iostream>
 #include <fstream>
@@ -79,7 +79,7 @@ Eigen::VectorXd ConvertNumpyToEigenVector(PyObject* in)
 }
 
 #include <vector>
-%include "sparsegrid/sparsegrid.hpp"
+%include "sparsegrid/regular_grid.hpp"
 
 
 %init
