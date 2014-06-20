@@ -1,4 +1,8 @@
-CC      = g++ -std=c++11 -stdlib=libstdc++ -Wall 
+CC      = g++ -std=c++11 -Wall 
+platform=$(shell uname)
+ifeq  ($(platform), Darwin)
+CC+= -stdlib=libstdc++ 
+endif
 DEBUG   =  -g -ggdb
 RELEASE = -O2
 INCLUDE = -I$(CURDIR)/../ -I$(CURDIR)
