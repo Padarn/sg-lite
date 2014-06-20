@@ -1,8 +1,5 @@
 CC      = g++ -std=c++11 -Wall 
 platform=$(shell uname)
-ifeq  ($(platform), Darwin)
-CC+= -stdlib=libstdc++ 
-endif
 DEBUG   =  -g -ggdb
 RELEASE = -O2
 INCLUDE = -I$(CURDIR)/../ -I$(CURDIR)
@@ -12,6 +9,11 @@ SRCS = $(wildcard *.cpp)
 HEADERS = $(patsubst %.cpp,%.hpp,$(SRCS))
 OBJS = $(patsubst %.cpp,%.o,$(SRCS))
 TARGETLIB = libsg-lite.so
+
+ifeq  ($(platform), Darwin)
+CC+= -stdlib=libstdc++ 
+LDFLAGS+= -install_name ${CURDIR}"/"${TARGETLIB}
+endif
 
 all: ${TARGETLIB}
 
