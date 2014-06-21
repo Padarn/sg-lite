@@ -10,7 +10,7 @@ numpyinclude = numpy.__file__[:-12]+'core/include/'
 libpath = os.path.realpath('../sparsegrid/')
 platform = sys.platform
 if platform != 'darwin':
-    runtime = '-rpath ' + libpath
+    runtime = '-Wl,-rpath=' + libpath
 else:
     runtime = ''
 
