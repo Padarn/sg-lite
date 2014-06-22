@@ -63,7 +63,7 @@ Eigen::VectorXd ConvertNumpyToEigenVector(PyObject* in)
     // }
     Eigen::VectorXd out(size);
     out.fill(0);
-    double *  values = ((double *) array_data(in));
+    double *  values = ((double *) PyArray_DATA(in));
     // Eigen::VectorXd::Scalar* data = static_cast<typename Eigen::VectorXd::Scalar*>(PyArray_DATA(temp));
     for (long int i = 0; i != size; ++i){
     	// std::cout << "data " << data[i] << std::endl;
@@ -71,12 +71,97 @@ Eigen::VectorXd ConvertNumpyToEigenVector(PyObject* in)
     }
     return out;
 }
+
+
+Eigen::MatrixXd ConvertNumpyToEigenMatrix(PyObject* in)
+{
+    int rows = 0;
+    int cols = 0;
+     // check numpy array and get size
+    if (!is_array(in))
+    {
+      PyErr_SetString(PyExc_ValueError, "The given input is not known as a NumPy array or matrix.");
+    }
+    // Check dimensions
+    else if (array_numdims(in) != 2)
+    {
+      PyErr_SetString(PyExc_ValueError, "Wanted 2D Matrix.");
+    }
+    else {
+        rows = array_size(in,0);
+        cols = array_size(in,1);
+    }
+
+    // extract data
+    int isNewObject = 0;
+    PyArrayObject* temp;
+    PyArg_ParseTuple(in, "O", &temp);
+     // = obj_to_array_contiguous_allow_conversion(in, array_type(in), &isNewObject);
+    // if (temp == NULL)
+    // {
+    //   PyErr_SetString(PyExc_ValueError, "Impossible to convert the input into a Python array object.");
+    // }
+    Eigen::MatrixXd out(rows,cols);
+    out.fill(0);
+    double *  values = ((double *) PyArray_DATA(in));
+    // Eigen::VectorXd::Scalar* data = static_cast<typename Eigen::VectorXd::Scalar*>(PyArray_DATA(temp));
+    for (long int i = 0; i != rows; ++i){
+        for(long int j = 0; j != cols; ++j){
+            // std::cout << "data " << data[i] << std::endl;
+            out(i,j) = values[i*rows+j];
+        }
+    }
+
+    return out;
+
+    }
+
+
+
 %}
+
 
 %typemap(in, fragment="PadarnTestFrag") Eigen::VectorXd
 {
   $1 = ConvertNumpyToEigenVector($input);
 }
+
+%typemap(freearg) Eigen::VectorXd
+{
+  // Do nothing. Needed so that default free arg is not used
+};
+
+%typemap(freearg) Eigen::VectorXd &
+{
+  // Do nothing. Needed so that default free arg is not used
+};
+
+%typemap(out) Eigen::VectorXd
+{
+  
+    npy_intp dims[1] = {($1).size()};
+    PyObject* array = PyArray_SimpleNew(1, dims, NPY_DOUBLE);
+    double* data = ((double *)PyArray_DATA( array ));
+    for (int i = 0; i != dims[0]; ++i){
+        *data++ = ($1)(i);
+    }
+    $result = array;
+}
+
+%typemap(in, fragment="PadarnTestFrag") Eigen::MatrixXd
+{
+  $1 = ConvertNumpyToEigenMatrix($input);
+}
+
+%typemap(freearg) Eigen::MatrixXd
+{
+  // Do nothing. Needed so that default free arg is not used
+};
+
+%typemap(freearg) Eigen::MatrixXd &
+{
+  // Do nothing. Needed so that default free arg is not used
+};
 
 #include <vector>
 %include "sparsegrid/regular_grid.hpp"
@@ -87,6 +172,4 @@ Eigen::VectorXd ConvertNumpyToEigenVector(PyObject* in)
   import_array();
 %}
 
-%eigen_typemaps(Eigen::VectorXd)
-%eigen_typemaps(Eigen::MatrixXd)
 

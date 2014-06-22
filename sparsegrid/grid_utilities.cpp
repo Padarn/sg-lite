@@ -126,9 +126,9 @@ namespace gridutils {
 				}
 				else return false;
 			}
-			if (dindex>=strides(i))
+			if (dindex>=(strides(i)-1))
 			{
-				if(dindex == strides(i))
+				if(dindex == (strides(i)-1))
 				{
 					bit(i) = 0;
 					fixed(i) = 1;

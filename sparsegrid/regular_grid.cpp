@@ -73,7 +73,13 @@ void RegularGrid::HatDataBin(const matrix & data)
 
 vector RegularGrid::EvalPoints(matrix data)
 {
-	
+	// If uninitialized, assume constant.
+	if (!isInitialised_)
+	{
+		Initialize();
+		data_.fill(1.0);
+	}
+
 	vector result(data.rows());
 	result.fill(0);
 	int ndata = data.rows();
@@ -92,7 +98,7 @@ vector RegularGrid::EvalPoints(matrix data)
 		vector corner = gridutils::CornerStrides(x, levels_, boundary_);
 
 		// get initial bit and fixed dimensions
-		bit.fill(0); fixed.fill(0);
+		bit.fill(0); fixed.fill(0); nfixed = 0;
 		inDomain = gridutils::BoundaryBitAndFixed(strides_, corner, boundary_, 
 												  bit, fixed, nfixed);
 		value = 0;
