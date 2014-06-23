@@ -126,6 +126,12 @@ Eigen::MatrixXd ConvertNumpyToEigenMatrix(PyObject* in)
   $1 = ConvertNumpyToEigenVector($input);
 }
 
+%typemap(in, fragment="PadarnTestFrag", numinputs=0) Eigen::VectorXd & result
+ ( Eigen::VectorXd TEMP)
+{
+  $1 = &TEMP;
+};
+
 %typemap(freearg) Eigen::VectorXd
 {
   // Do nothing. Needed so that default free arg is not used
@@ -136,21 +142,57 @@ Eigen::MatrixXd ConvertNumpyToEigenMatrix(PyObject* in)
   // Do nothing. Needed so that default free arg is not used
 };
 
-%typemap(out) Eigen::VectorXd
-{
-  
-    npy_intp dims[1] = {($1).size()};
-    PyObject* array = PyArray_SimpleNew(1, dims, NPY_DOUBLE);
-    double* data = ((double *)PyArray_DATA( array ));
-    for (int i = 0; i != dims[0]; ++i){
-        *data++ = ($1)(i);
-    }
-    $result = array;
+%typemap(newfree) Eigen::VectorXd {
+ // Do nothing.
 }
 
 %typemap(in, fragment="PadarnTestFrag") Eigen::MatrixXd
 {
   $1 = ConvertNumpyToEigenMatrix($input);
+}
+
+%typemap(in) Eigen::MatrixXd & (Eigen::MatrixXd TEMP)
+{
+
+  int rows = 0;
+  int cols = 0;
+
+  rows = PyArray_DIM($input,0);
+  cols = PyArray_DIM($input,1);
+
+  PyArrayObject* temp;
+  PyArg_ParseTuple($input, "O", &temp);  
+
+  TEMP.resize(rows,cols);
+  TEMP.fill(0);
+
+  double *  values = ((double *) PyArray_DATA($input));
+  for (long int i = 0; i != rows; ++i){
+      for(long int j = 0; j != cols; ++j){
+          // std::cout << "data " << data[i] << std::endl;
+          TEMP(i,j) = values[i*rows+j];
+      }
+  }
+  std::cout << TEMP << std::endl;
+  $1 = &TEMP;
+
+}
+
+%typemap(freearg) Eigen::MatrixXd &{
+}
+%typemap(freearg) Eigen::VectorXd &{
+}
+
+
+%typemap(argout) Eigen::VectorXd & result
+{
+    npy_intp dims[1] = {(*$1).size()};
+    PyObject* array = PyArray_SimpleNew(1, dims, NPY_DOUBLE);
+    double* data = ((double *)PyArray_DATA( array ));
+    for (int i = 0; i != dims[0]; ++i){
+        *data++ = (*$1).data()[i];
+    }
+    $result = array;
 }
 
 %typemap(freearg) Eigen::MatrixXd

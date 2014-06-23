@@ -71,7 +71,7 @@ typedef struct RegularGrid
 	//                   those points assuming that the stored data vector 
 	//                   corresponds to coefficients of the nodal basis
 	//
-	vector EvalPoints(matrix data);
+	void EvalPoints(matrix & data, vector & result);
 
 
 } RegularGrid ;

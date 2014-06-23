@@ -1,5 +1,4 @@
-// -*- c++ -*-
- 
+
 %{
   #include <Eigen/Core>
 %}
@@ -101,6 +100,7 @@
 // In: (nothing: no constness)
 %typemap(in, fragment="Eigen_Fragments") CLASS (CLASS temp)
 {
+  std::cout <<"here"<<std::endl;
   ConvertFromNumpyToEigenMatrix<CLASS>(&temp, $input);
   $1 = temp;
 }

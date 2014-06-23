@@ -71,7 +71,7 @@ void RegularGrid::HatDataBin(const matrix & data)
 	}
 }
 
-vector RegularGrid::EvalPoints(matrix data)
+void RegularGrid::EvalPoints(matrix & data, vector & result)
 {
 	// If uninitialized, assume constant.
 	if (!isInitialised_)
@@ -80,7 +80,7 @@ vector RegularGrid::EvalPoints(matrix data)
 		data_.fill(1.0);
 	}
 
-	vector result(data.rows());
+	result.resize(data.rows());
 	result.fill(0);
 	int ndata = data.rows();
 
@@ -120,7 +120,6 @@ vector RegularGrid::EvalPoints(matrix data)
 		result(i)=value;
 	}
 
-	return result;
 }
 
 // Do L2 projection of stored data
