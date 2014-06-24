@@ -56,6 +56,19 @@ namespace gridutils{
 	void IncreaseBit(vector & bit, vector dimsizes, vector dvec);
 
 	//
+	// DristributeBit: Helper function to move bit indicies to respect
+	//                 size maxes.
+	//
+	void DistributeBit(vector & bit, vector sizes);
+
+	//
+	// IncreaseBitMonotone: Increases a 'bit vector' corresponding to the 
+	//                      grid indicies for d-dimensions, so that continued 
+	//                      incrementing leads to monotone traversal of grid
+	//
+	void IncreaseBitMonotone(vector & bit, vector dimsizes);
+
+	//
 	// CornerStrides: Returns a vector corresponding to the strides in each
 	//                dimension to index the 'left most corner index', which
 	//                is the smallest grid index of those adjacent to x.

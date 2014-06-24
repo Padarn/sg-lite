@@ -107,6 +107,82 @@ namespace gridutils {
 		}
 	}
 
+	void DistributeBit(vector & bit, vector sizes)
+	{
+		if (bit.sum() > sizes.sum())
+		{
+			bit.fill(0);
+			return;
+		}
+		for(int i = 0; i < sizes.size(); i++)
+		{
+			if(bit(i) > sizes(i))
+			{
+				int diff = bit(i)-sizes(i);
+				bit(i+1) = bit(i+1) + diff;
+				bit(i) = sizes(i);
+			}
+		}
+	}
+
+	void IncreaseBitMonotone(vector & bit, vector sizes)
+	{
+		int n = bit.size();
+		while(true)
+		{
+			// Get non-zero entires
+			int last = -1;
+			int second = -1;
+			int numnonzero=0;
+			for(int i = 0; i < n; i++)
+			{
+				if(bit(i)!=0)
+				{
+					second = last;
+					last = i;
+					numnonzero++;
+				}
+			}
+
+			// If the zero vector
+			if (numnonzero==0){
+				bit(0)=1;
+				return;
+			}
+
+			// If non-zero is not on the end move over 
+			else if (last != n-1)
+			{
+				bit(last) = bit(last) - 1;
+				bit(last + 1) = 1;
+				DistributeBit(bit, sizes);
+			}
+
+			// If is on end and only one
+			else if (last == n-1 && numnonzero == 1)
+			{
+				bit(0) = bit(n-1) + 1;
+				bit(n-1) = 0;
+				DistributeBit(bit, sizes);
+			}
+
+			// Otherwise
+			else
+			{
+				int tmp = bit(last);
+				bit(last) = 0;
+				bit(second) = bit(second) - 1;
+				bit(second -1) = bit(second -1) + tmp + 1;
+				DistributeBit(bit, sizes);
+			}
+
+			if (!(bit(n-1) > sizes(n-1)))
+			{
+				return;
+			}
+		}
+	}
+
 	vector CornerStrides(vector x, vector level, bool boundary)
 	{
 		int d = level.size();
