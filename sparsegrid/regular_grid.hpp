@@ -29,7 +29,8 @@ typedef struct RegularGrid
 	int ndims_; 
 	int size_;
 	int ndata_;
-	vector levels_;  
+	vector levels_;
+	vector sizes_; 
 	vector strides_; 
 	vector data_;
 	bool boundary_;
@@ -58,6 +59,16 @@ typedef struct RegularGrid
 	void HatDataBin(const matrix & data);  // matrix input
 	void HatDataBin(std::string filename); // filename input
 
+
+	//
+	// HaarDataBin: Evaluates haar basis function at each grid point for set of 
+	//             input data. Does not divide by ndata, but stores it instead.
+	// Input Note: Input can either be the matrix of data or a filename.
+	// Note: If data_ is not zero, this just adds to it.
+	//
+	void HaarDataBin(const matrix & data); // matrix input
+	void HaarDataBin(std::string filename); // filename input
+
 	//
 	// ProjectionDensity: Treats the stored data vector of the grid as an 
 	//                    evaluation of point data over the grid and then
@@ -71,7 +82,7 @@ typedef struct RegularGrid
 	//                   those points assuming that the stored data vector 
 	//                   corresponds to coefficients of the nodal basis
 	//
-	void EvalPoints(matrix & data, vector & result);
+	vector EvalPoints(matrix & data);
 
 
 } RegularGrid ;

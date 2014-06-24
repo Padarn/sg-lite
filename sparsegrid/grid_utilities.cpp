@@ -1,5 +1,6 @@
 #include "grid_utilities.hpp"
 #include <iostream>
+#include <cmath>
 
 namespace gridutils {
 
@@ -11,7 +12,7 @@ namespace gridutils {
 	{
 		int result = 1;
 		for(int i = 0; i<b; i++){
-			result = result*b;
+			result = result*a;
 		}
 		return result;
 	}
@@ -49,6 +50,17 @@ namespace gridutils {
 			sizes(i)=RegularGridSize1D(level(i), boundary);
 		}
 		return sizes;
+	}
+
+	vector StrideFromSize(vector sizes)
+	{
+		vector strides(sizes.size());
+		strides(0) = 1;
+		for(int i = 0; i<sizes.size()-1; i++)
+		{
+			strides(i+1)=sizes(i);
+		}
+		return strides;
 	}
 
 	// ----------------------------------------------            
@@ -193,7 +205,7 @@ namespace gridutils {
 		double val = 1;
 		int d = x.size();
 		for(int i=0; i<d;i++){
-			val*=(1-abs(x(i)));
+			val*=(1-fabs(x(i)));
 		}
 		return val;
 	}

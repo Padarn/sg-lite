@@ -38,6 +38,12 @@ namespace gridutils{
 	vector RegularGridSizeVector(vector level, bool boundary);
 
 	//
+	// StrideFromSize: Converts an vector of sizes in the corresponding strides
+	//                 by shifting to the right and inserting 1.
+	//
+	vector StrideFromSize(vector sizes);
+
+	//
 	// IncreaseBit: Increases a 'bit vector'. This is really an internal 
 	//				function for iterating over indices.
 	// Input notes: bit - is modified in place
