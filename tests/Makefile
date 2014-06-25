@@ -12,7 +12,7 @@ LIBRARY = -lsg-lite
 LIBINCLUDE = -L../sparsegrid
 
 ifeq  ($(platform), Darwin)
-CC+= -stdlib=libstdc++ 
+CC+= -stdlib=libstdc++
 LDFLAGS+= -install_name ${CURDIR}"/"${TARGETLIB}
 endif
 

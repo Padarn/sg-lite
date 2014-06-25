@@ -11,7 +11,7 @@ int main(){
 	//------------------
 	// Reading from file
 	matrix data;
-	data = read_csv_matrix("../data_heat.csv");
+	data = read_csv_matrix("data_heat.csv");
 	//-----------------
 
 	int ndim = 2;
@@ -22,10 +22,11 @@ int main(){
 	RegularGrid a(ndim, levels, full);
 
 	a.HaarDataBin(data);
+	a.CollectCDF();
 
 	matrix grid = plottools::MeshGrid(31,ndim);
 	std::ofstream myfile;
-	myfile.open("result.txt");
+	myfile.open("tests/result.txt");
 	myfile << a.EvalPoints(grid);
 	myfile.close();
 

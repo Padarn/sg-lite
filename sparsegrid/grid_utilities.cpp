@@ -114,7 +114,7 @@ namespace gridutils {
 			bit.fill(0);
 			return;
 		}
-		for(int i = 0; i < sizes.size(); i++)
+		for(int i = 0; i < sizes.size()-1; i++)
 		{
 			if(bit(i) > sizes(i))
 			{
@@ -172,7 +172,7 @@ namespace gridutils {
 				int tmp = bit(last);
 				bit(last) = 0;
 				bit(second) = bit(second) - 1;
-				bit(second -1) = bit(second -1) + tmp + 1;
+				bit(second + 1) = bit(second + 1) + tmp + 1;
 				DistributeBit(bit, sizes);
 			}
 

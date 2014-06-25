@@ -173,6 +173,41 @@ vector RegularGrid::EvalPoints(matrix & data)
 
 }
 
+void RegularGrid::CollectCDF()
+{
+	vector sizesm1(ndims_); sizesm1 = sizes_.array()-1; 
+	vector index(ndims_); index.fill(0);
+	for(int i = 0; i < size_; i++)
+	{
+		// collect values from all children - except on boundary
+		// where there will be no children in each dimension.
+		vector corner = index.array()-1;
+		vector bit(ndims_); vector fixed(ndims_); int nfixed;
+		bit.fill(0); fixed.fill(0); nfixed = 0;
+		vector onevec(ndims_); onevec.fill(1.0);
+		bool inDomain = gridutils::BoundaryBitAndFixed(sizes_, corner, boundary_, 
+												  bit, fixed, nfixed);
+		// if x was in domain then it gives valid indicies so proceed
+		if (inDomain)
+		{
+			// -1 is meant to avoid the index itself
+			int neighbours = gridutils::PowInt(2, ndims_ - nfixed)-1;
+			for(int j = 0; j < neighbours; j++)
+			{
+				vector indexchild = bit+corner;
+				int mult  =(int) (index - indexchild).sum();
+				if (mult % 2) mult = 1;
+				else mult = -1;
+				data_[strides_.dot(index)] += data_[strides_.dot(indexchild)]*mult;
+				gridutils::IncreaseBit(bit, onevec, fixed);
+
+			}
+		}
+
+		gridutils::IncreaseBitMonotone(index, sizesm1);
+	}
+}
+
 // Do L2 projection of stored data
 void RegularGrid::ProjectionDensity()
 {	

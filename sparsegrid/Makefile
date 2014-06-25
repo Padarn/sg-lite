@@ -11,7 +11,7 @@ OBJS = $(patsubst %.cpp,%.o,$(SRCS))
 TARGETLIB = libsg-lite.so
 
 ifeq  ($(platform), Darwin)
-CC+= -stdlib=libstdc++ 
+CC+= -stdlib=libstdc++
 LDFLAGS+= -install_name ${CURDIR}"/"${TARGETLIB}
 endif
 

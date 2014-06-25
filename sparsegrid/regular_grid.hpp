@@ -70,6 +70,12 @@ typedef struct RegularGrid
 	void HaarDataBin(std::string filename); // filename input
 
 	//
+	// CollectCDF: Collects the result of calculating some sort of binned data
+	//             across the grid in order to approximate the CDF.
+	//
+	void CollectCDF();
+
+	//
 	// ProjectionDensity: Treats the stored data vector of the grid as an 
 	//                    evaluation of point data over the grid and then
 	//                    calculates coefficients of density estimate based on 
