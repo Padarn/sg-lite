@@ -1,5 +1,8 @@
+*_wrap*
+*.so
 *.o
 *.csv
 *.txt
 test
 tmp/
+tests/*_run
