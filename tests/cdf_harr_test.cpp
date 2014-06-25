@@ -1,3 +1,13 @@
+/*
+
+TEST cdf_haar_test: This test will run through the functionality of using the 
+	 				cdf estimation on a full grid using the haar binning. The 
+	 				result should be a linear interpolant of the histogram.
+
+*/
+
+
+
 #include "sparsegrid/regular_grid.hpp"
 #include "sparsegrid/plot_tools.hpp"
 #include <Eigen/Dense>
