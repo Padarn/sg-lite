@@ -25,13 +25,14 @@ namespace gridops {
 	//               dimension.
 	// Note: data is modified in place.
 	//
-	void Projection1D(vector & data, vector strides, vector levels, int size, 
-					  int dim);
+	void Projection1D(vector & data, vector strides, vector levels, 
+		              vector sizes, int size, int dim);
 
 	//
 	// ProjectionND: Performs projection in each dimension sequentially.
 	// Note: data is modified in place.
 	//
-	void ProjectionND(vector & data, vector strides, vector levels, int size);
+	void ProjectionND(vector & data, vector strides, vector levels, 
+		              vector sizes, int size);
 
 }

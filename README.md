@@ -3,6 +3,24 @@ sg-lite
 
 This is intended a light weight Sparse Grid implementation focused mostly on density estimation. This is a WIP and this readme will be filled with up to date comments about the process.
 
+25/06/14: After struggling with a swig error for 3-4 days, and debugging my new basic functionality
+I think I finally have the basics working again ... 
+
+The roadmap from here in my mind is
+
+- Tests for the basic functionality: Make sure it is working for arbitrary dimensions and with and without grid. Add checks for file not found etc.
+
+- Add combination technique class and basic combination technique construction. Test
+
+- Implement generalized sparse grid combination technique, to allow for adaptivity in dimension at least.
+
+- Implment a tree structure for a dimensionally adaptive PDF at least.
+
+- Add spatial adaptivity ... this will be a big job. 
+
+- Plus somewhere in there add a heat solve.
+
+
 20/06/14: I have finished a major reorganization of the code. Unfortunately things are probably a little slower and less general now, but hopefully it is more readable, and will be easier to extend to the point I need. 
 
 New build instructions.

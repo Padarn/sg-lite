@@ -44,6 +44,7 @@ void RegularGrid::HatDataBin(const matrix & data)
 	vector relativeX(ndims_);
 	vector index(ndims_);
 	int nfixed;
+	vector onevec(ndims_); onevec.fill(1.0);
 	bool inDomain;
 
 	for(int i = 0; i < ndata; i++)
@@ -66,7 +67,8 @@ void RegularGrid::HatDataBin(const matrix & data)
 				relativeX = gridutils::RelativeXScaled(x, index,
 													   levels_, boundary_);
 				data_[strides_.dot(index)] += gridutils::HatVal(relativeX); 
-				gridutils::IncreaseBit(bit, sizes_, fixed);
+				gridutils::IncreaseBit(bit, onevec, fixed);
+
 			}
 		}
 	}
@@ -175,6 +177,7 @@ vector RegularGrid::EvalPoints(matrix & data)
 
 void RegularGrid::CollectCDF()
 {
+	data_ = data_.array()/ndata_;
 	vector sizesm1(ndims_); sizesm1 = sizes_.array()-1; 
 	vector index(ndims_); index.fill(0);
 	for(int i = 0; i < size_; i++)
@@ -205,13 +208,14 @@ void RegularGrid::CollectCDF()
 		}
 
 		gridutils::IncreaseBitMonotone(index, sizesm1);
-	}
+	} 
 }
 
 // Do L2 projection of stored data
 void RegularGrid::ProjectionDensity()
 {	
-	gridops::ProjectionND(data_, strides_, levels_, size_);
+	data_ = data_.array()/ndata_;
+	gridops::ProjectionND(data_, strides_, levels_, sizes_, size_);
 }
 
 

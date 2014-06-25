@@ -1,4 +1,5 @@
 #include "grid_operations.hpp"
+#include <iostream>
 
 namespace gridops{
 
@@ -25,15 +26,13 @@ namespace gridops{
 		beta(zero+(N-1)*step)=(beta(zero+(N-1)*step)-1.0/6.0*beta(zero+((N-1)-1)*step))/
 							  (1.0/3.0-1.0/6.0*c((N-1)-1));
 
-		// multiply by scale and it will propagate down
-		beta(zero+(N-1)*step) *= gridutils::PowInt(2,level-1);
 		for(int i = N-2; i >= 0; i--)
 		{
 			beta(zero+i*step) -= c(i)*beta(zero+(i+1)*step);
 		}
 	}
 
-	void Projection1D(vector & data, vector strides, vector levels, int size,
+	void Projection1D(vector & data, vector strides, vector levels, vector sizes, int size,
 					int dim)
 	{
 		int ndim = levels.size();
@@ -41,28 +40,30 @@ namespace gridops{
 		int stride;
 
 		// Interate through 'start' indicies and project
-		vector zsize = strides;
+		vector zsize = sizes;
 		zsize.array()-1;
-		dsize = size*1.0/strides(dim);
+		dsize = size*1.0/sizes(dim);
 		vector bit(ndim); bit.fill(0);
 		stride = strides(dim);
 
-		for(int i=0; i < dsize; i++)
+		for(int i=0; i < sizes(dim); i++)
 		{
 			int indexstart = bit.dot(strides);
 			Projection1DSlice(data, indexstart, stride, dsize, levels(dim));
 			gridutils::IncreaseBit(bit, zsize, dim);
 		}
+		data  = data.array()*gridutils::PowInt(2,levels(dim)-1);
+
+
 
 	}
 
-	void ProjectionND(vector & data, vector strides, vector levels, int size)
+	void ProjectionND(vector & data, vector strides, vector levels, vector sizes,  int size)
 	{
-
 		int ndim = levels.size();
 		for(int d=0; d<ndim; d++)
 		{
-			Projection1D(data, strides, levels, size, d);
+			Projection1D(data, strides, levels, sizes, size, d);
 		}
 	}
 }
