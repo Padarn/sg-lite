@@ -1,14 +1,15 @@
-CC      = g++ -std=c++11 -Wall 
+CC      = g++ -std=c++11 -Wall
 platform=$(shell uname)
 DEBUG   =  -g -ggdb
 RELEASE = -O2
+GTEST = "/Users/padarn/work/gtest/include"
 INCLUDE = -I$(CURDIR)/../ -I$(CURDIR)
 CFLAGS  = -fPIC
 SRCS = $(wildcard *.cpp)
 HEADERS = $(patsubst %.cpp,%.hpp,$(SRCS))
 OBJS = $(patsubst %.cpp,%.o,$(SRCS))
 EXE = $(patsubst %.cpp,%_run,$(SRCS))
-LIBRARY = -lsg-lite
+LIBRARY = -lsg-lite -lgtest -lgtest_main
 LIBINCLUDE = -L../sparsegrid
 
 ifeq  ($(platform), Darwin)
@@ -25,6 +26,6 @@ all: $(EXE)
 .PHONY: clean
 
 clean:
-	rm *.o
-	rm *.so
-	rm *_run
+	$(RM) *.o
+	$(RM) *.so
+	$(RM) *_run
