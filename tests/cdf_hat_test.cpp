@@ -11,12 +11,12 @@ int main(){
 	//------------------
 	// Reading from file
 	matrix data;
-	data = read_csv_matrix("data_heat.csv");
+	data = read_csv_matrix("data/histsingle.csv");
 	//-----------------
 
 	int ndim = 2;
 	vector levels(ndim);
-	levels.fill(4);
+	levels.fill(8);
 	bool full = true;
 
 	RegularGrid a(ndim, levels, full);
@@ -26,7 +26,7 @@ int main(){
 
 	matrix grid = plottools::MeshGrid(31,ndim);
 	std::ofstream myfile;
-	myfile.open("tests/result.txt");
+	myfile.open("result.txt");
 	myfile << a.EvalPoints(grid);
 	myfile.close();
 
