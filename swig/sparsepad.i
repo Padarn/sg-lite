@@ -27,7 +27,6 @@ typedef Eigen::MatrixXd matrix;
 %}
 
 %include "numpy.i"
-%include "eigen.i"
 %include "std_string.i"
 
 %typedef Eigen::VectorXd vector;   
