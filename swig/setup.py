@@ -14,18 +14,18 @@ if platform != 'darwin':
 else:
     runtime = ''
 
-sparsepad = Extension('_sparsepad',
-                           sources=['sparsepad_wrap.cxx'],
+pysglite = Extension('_pysglite',
+                           sources=['pysglite_wrap.cxx'],
                            libraries=['sg-lite'],
                            include_dirs=['../',numpyinclude],
                            library_dirs=[libpath],
                            extra_objects=[runtime]
                            )
 
-setup (name = 'sparsepad',
+setup (name = 'pysglite',
        version = '0.1',
        author      = "Padarn Wilson",
        description = """sg-lite swig interface""",
-       ext_modules = [sparsepad],
-       py_modules = ["sparsepad"],
+       ext_modules = [pysglite],
+       py_modules = ["pysglite"],
        )

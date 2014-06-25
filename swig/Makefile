@@ -1,10 +1,10 @@
 # SWIG
-INTERFACES = sparsepad.i
+INTERFACES = pysglite.i
 WRAPPERS = $(INTERFACES:.i=_wrap.cxx)
 PROXIES = $(INTERFACES:.i=.py )
 
 all:
-	swig -c++ -python  -I../ sparsepad.i
+	swig -c++ -python  -I../ pysglite.i
 	python setup.py install
 
 # Clean target
