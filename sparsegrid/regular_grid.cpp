@@ -192,7 +192,7 @@ void RegularGrid::CollectCDF()
 		bool inDomain = gridutils::BoundaryBitAndFixed(sizes_, corner, boundary_, 
 												  bit, fixed, nfixed);
 		// if x was in domain then it gives valid indicies so proceed
-		if (inDomain)
+		if (true)
 		{
 			// -1 is meant to avoid the index itself
 			int neighbours = gridutils::PowInt(2, ndims_ - nfixed)-1;

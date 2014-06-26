@@ -1,4 +1,14 @@
+/*
+
+TEST combination_cdf_haar_test: This test will run through the functionality of 
+					using the cdf estimation on a combination grid using the 
+					haar binning. The result should be a linear interpolant of 
+					the histogram.
+
+*/
+
 #include "sparsegrid/regular_grid.hpp"
+#include "sparsegrid/combination_grid.hpp"
 #include "sparsegrid/plot_tools.hpp"
 #include <Eigen/Dense>
 #include <iostream>
@@ -15,12 +25,10 @@ int main(){
 	//-----------------
 
 	int ndim = 2;
-	vector levels(ndim);
-	levels.fill(0);
-	levels(1) = 3;
 	bool full = true;
 
-	RegularGrid a(ndim, levels, full);
+	CombinationGrid a(ndim, full);
+	a.SetupStandardCombinationGrid(4);
 
 	a.HatDataBin(data);
 	a.CollectCDF();

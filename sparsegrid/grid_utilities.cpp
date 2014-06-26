@@ -197,22 +197,24 @@ namespace gridutils {
 		return corner;
 	}
 
+	// TODO - NEEDS FIXING
 	bool BoundaryBitAndFixed(vector strides, vector corner, bool boundary, 
 							 vector & bit, vector & fixed, int & nfixed)
 	{
+		bool indomain = true;
 		int d = strides.size();
 		for(int i = 0; i<d; i++)
 		{
 			int dindex = corner(i);
 			if (dindex < 0)
 			{
-				if (dindex == -1 && !boundary)
+				if (dindex == -1)
 				{
 					bit(i) = 1;
 					fixed(i) = 1;
 					nfixed++;
 				}
-				else return false;
+				if (boundary) indomain = false;
 			}
 			if (dindex>=(strides(i)-1))
 			{
@@ -222,11 +224,11 @@ namespace gridutils {
 					fixed(i) = 1;
 					nfixed++;
 				}
-			else return false;
+			else indomain = false;
 			} 
 		}
 
-		return true;
+		return indomain;
 	}
 
 	// ----------------------------------------------            
