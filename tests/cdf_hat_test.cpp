@@ -17,7 +17,7 @@ int main(){
 	int ndim = 2;
 	vector levels(ndim);
 	levels.fill(0);
-	levels(1) = 3;
+	levels(0) = 3;
 	bool full = true;
 
 	RegularGrid a(ndim, levels, full);

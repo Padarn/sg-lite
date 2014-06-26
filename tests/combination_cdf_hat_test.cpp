@@ -28,7 +28,7 @@ int main(){
 	bool full = true;
 
 	CombinationGrid a(ndim, full);
-	a.SetupStandardCombinationGrid(4);
+	a.SetupStandardCombinationGrid(8);
 
 	a.HatDataBin(data);
 	a.CollectCDF();

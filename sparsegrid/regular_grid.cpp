@@ -54,7 +54,7 @@ void RegularGrid::HatDataBin(const matrix & data)
 		vector corner = gridutils::CornerStrides(x, levels_, boundary_);
 
 		// get initial bit and fixed dimensions
-		bit.fill(0); fixed.fill(0);
+		bit.fill(0); fixed.fill(0); nfixed = 0;
 		inDomain = gridutils::BoundaryBitAndFixed(sizes_, corner, boundary_, 
 												  bit, fixed, nfixed);
 		// if x was in domain then it gives valid indicies so proceed
