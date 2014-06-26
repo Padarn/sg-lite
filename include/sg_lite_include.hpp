@@ -1,0 +1,12 @@
+#include "sparsegrid/regular_grid.hpp"
+#include <Eigen/Dense>
+#include <iostream>
+#include <fstream>
+#include <sstream>
+#include "sparsegrid/file_reading.hpp"
+#include "sparsegrid/grid_typedefs.hpp"
+#include "sparsegrid/grid_typedefs.hpp"
+#include <vector>
+#include <memory>
+#include "sparsegrid/grid_operations.hpp"
+#include "sparsegrid/grid_utilities.hpp"
