@@ -20,5 +20,5 @@ clean:
 	cd swig; make clean
 	cd tests; make clean
 
-swig:
+swig: sparsegrid/libsg-lite.so
 	cd swig; make

@@ -3,6 +3,8 @@ sg-lite
 
 This is intended a light weight Sparse Grid implementation focused mostly on density estimation. This is a WIP and this readme will be filled with up to date comments about the process.
 
+25/06/14: A note on tests. I have decided to use the google c++ testing framework. I'm going to call this a hard dependency to support building of tests. Test builds will fail without gtests paths.
+
 25/06/14: After struggling with a swig error for 3-4 days, and debugging my new basic functionality
 I think I finally have the basics working again ... 
 

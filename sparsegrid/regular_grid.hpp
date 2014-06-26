@@ -93,5 +93,4 @@ typedef struct RegularGrid
 
 } RegularGrid ;
 
-
 #endif

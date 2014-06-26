@@ -2,7 +2,7 @@ CC      = g++ -std=c++11 -Wall
 platform=$(shell uname)
 DEBUG   =  -g -ggdb
 RELEASE = -O2
-INCLUDE = -I$(CURDIR)/../ -I$(CURDIR)
+INCLUDE = -I$(CURDIR)/../ -I$(CURDIR) -I$(CURDIR)../include
 CFLAGS  = -fPIC
 LDFLAGS =  -shared
 SRCS = $(wildcard *.cpp)

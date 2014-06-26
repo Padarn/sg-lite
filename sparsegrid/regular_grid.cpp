@@ -24,6 +24,7 @@ void RegularGrid::Initialize()
 {
 	data_ = vector(size_);
 	data_.fill(0);
+	ndata_ = 0;
 	isInitialised_ = true;
 }
 
