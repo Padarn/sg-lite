@@ -66,7 +66,7 @@ void CombinationGrid::SetupStandardCombinationGrid(int level)
 		// calculate bits at this level
 		int nlevel = nchoosek(ndims_+i-1,i);
 		// calculate coefficient at this level
-		double coef = pow(-1,ndims_-i)*nchoosek(ndims_-1,level-i);
+		double coef = pow(-1,level-i)*nchoosek(ndims_-1,level-i);
 		// get starting level
 		onevec.fill(i);
 		vector bit(ndims_); bit.fill(0); bit(0)=i;
