@@ -10,3 +10,4 @@
 #include <memory>
 #include "sparsegrid/grid_operations.hpp"
 #include "sparsegrid/grid_utilities.hpp"
+#include "sparsegrid/vector_tools.hpp"

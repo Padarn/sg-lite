@@ -36,7 +36,7 @@ typedef struct CombinationGrid
 {
 
 	int ndims_;
-	int boundary_;
+	bool boundary_;
 	std::vector<vector> levels_;
 	std::vector<double> coefs_; // float, int?
 	std::vector<RegularGrid *> grids_;
