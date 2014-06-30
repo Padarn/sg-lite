@@ -30,6 +30,12 @@ namespace gridutils {
 		}
 	}
 
+	int SubGridSize1D(int level)
+	{
+		if (level == 0) return 2;
+		else return PowInt(2,level-1);
+	}
+
 	int RegularGridSize(vector level, bool boundary)
 	{
 		int n = level.size();
@@ -41,6 +47,17 @@ namespace gridutils {
 		return size;
 	}
 
+	int SubGridSize(vector level)
+	{
+		int n = level.size();
+		int size = 1;
+		for(int i = 0; i<n; i++)
+		{
+			size *= SubGridSize1D(level(i));
+		}
+		return size;
+	}
+
 	vector RegularGridSizeVector(vector level, bool boundary)
 	{
 		int n = level.size();
@@ -48,6 +65,17 @@ namespace gridutils {
 		for(int i = 0; i<n; i++)
 		{
 			sizes(i)=RegularGridSize1D(level(i), boundary);
+		}
+		return sizes;
+	}
+
+	vector SubGridSizeVector(vector level)
+	{
+		int n = level.size();
+		vector sizes(n);
+		for(int i = 0; i<n; i++)
+		{
+			sizes(i)=SubGridSize1D(level(i));
 		}
 		return sizes;
 	}
@@ -183,6 +211,18 @@ namespace gridutils {
 		}
 	}
 
+	vector SubGridIndex(vector x, vector level)
+	{
+		int d = level.size();
+		vector index(d);
+		for(int i=0; i<d; i++)
+		{
+			if (level(i)==0) index(i)=0;
+			else index(d)=floor(PowInt(2,level(i)-1) * x(i));
+		}
+		return index;
+	}
+
 	vector CornerStrides(vector x, vector level, bool boundary)
 	{
 		int d = level.size();
@@ -249,6 +289,23 @@ namespace gridutils {
 
 	}
 
+	vector IndexXSubGrid(vector index, vector level)
+	{
+		int d = level.size();
+		// Initialize result
+		vector X(d);
+		for(int i=0; i<d; i++)
+		{
+			if (level(i)==0){
+				X(i)=index(i);
+			} else {
+				X(i)=(2*index(i)+1)*pow(2,-level(i));
+			}
+		}
+		return X;
+
+	}
+
 	vector RelativeX(vector x, vector index, vector level, bool boundary)
 	{
 		int d = level.size();
@@ -274,6 +331,20 @@ namespace gridutils {
 		}
 		return relativeX;	
 	}
+
+	vector RelativeXScaledSubGrid(vector x, vector index, vector level)
+	{	
+		int d = level.size();
+		// Initialize result
+		vector relativeX(d);
+		vector indexX = IndexXSubGrid(index, level);
+		for(int i=0; i<d; i++)
+		{
+			relativeX(i) = (x(i) - indexX(i))*PowInt(2, level(i));	
+		}
+		return relativeX;	
+	}
+
 	// ----------------------------------------------            
 	//                  BASIS EVAL
 	// ----------------------------------------------
@@ -286,6 +357,16 @@ namespace gridutils {
 			val*=(1-fabs(x(i)));
 		}
 		return val;
+	}
+
+	double HaarVal(vector x)
+	{
+		double val = 1;
+		int d = x.size();
+		for(int i=0; i<d;i++){
+			if (x(i)>0) val*=(-1);
+		}
+		return val;	
 	}
 
 

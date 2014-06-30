@@ -25,6 +25,11 @@ namespace gridutils{
 	int RegularGridSize1D(int level, bool boundary);
 
 	//
+	// SubGridSize1D: Number of basis functions for one dimensional subgrid.
+	//
+	int SubridSize1D(int level, bool boundary);
+
+	//
 	// RegularGridSize: Takes a vector of the levels in each dimension and
 	//                  returns the total size of a regular grid with those
 	//                  levels.
@@ -32,10 +37,20 @@ namespace gridutils{
 	int RegularGridSize(vector level, bool boundary);
 
 	//
+	// SubGridSize: Calculates total number of subgrid basis functions.
+	//
+	int SubGridSize(vector level);
+
+	//
 	// RegularGridSizeVector: Takes a vector of the grid levels and returns a
 	//                        new vector of the one dimensional sizes.
 	//
 	vector RegularGridSizeVector(vector level, bool boundary);
+
+	//
+	// SubGridSizeVector: Calculates vector of one dimensional sizes for subgrid
+	//
+	vector SubGridSizeVector(vector level);
 
 	//
 	// StrideFromSize: Converts an vector of sizes in the corresponding strides
@@ -67,6 +82,12 @@ namespace gridutils{
 	//                      incrementing leads to monotone traversal of grid
 	//
 	void IncreaseBitMonotone(vector & bit, vector dimsizes);
+
+	// 
+	// SubGridIndex: Returns the index of the non-zero basis function for a
+	//               a point on a hierarchical subgrid.
+	//
+	vector SubGridIndex(vector x, vector level);
 
 	//
 	// CornerStrides: Returns a vector corresponding to the strides in each
@@ -101,9 +122,19 @@ namespace gridutils{
 	//
 	vector RelativeXScaled(vector x, vector index, vector level, bool boundary);
 
+	//
+	// RelativeXScaledSubGrid: Same as above but for subgrid
+	//
+	vector RelativeXScaledSubGrid(vector x, vector index, vector level);
+
 	// 
 	// HatVal: Evaluates hat function at x - assumes [-1,1] domain.
 	//
 	double HatVal(vector x);
+
+	// 
+	// HaarVal: Evaluates haar function at x - assumes [-1,1] domain.
+	//
+	double HaarVal(vector x);
 
 };

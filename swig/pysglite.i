@@ -8,6 +8,7 @@
 #define SWIG_FILE_WITH_INIT
 #include <numpy/arrayobject.h>
 #include "sparsegrid/regular_grid.hpp"
+#include "sparsegrid/sub_grid.hpp"
 #include "sparsegrid/file_reading.hpp"
 #include "sparsegrid/combination_grid.hpp"
 #include <Eigen/Core>
@@ -178,6 +179,6 @@ Eigen::MatrixXd * ConvertNumpyToEigenMatrix(PyObject* in)
 #include <vector>
 %include "sparsegrid/regular_grid.hpp"
 %include "sparsegrid/combination_grid.hpp"
-
+%include "sparsegrid/sub_grid.hpp"
 
 
