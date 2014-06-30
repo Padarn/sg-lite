@@ -44,26 +44,17 @@ Eigen::VectorXd * ConvertNumpyToEigenVector(PyObject* in)
 {
  	int size = 0;
 	 // check numpy array and get size
- 	if (!is_array(in))
-    {
-      PyErr_SetString(PyExc_ValueError, "The given input is not known as a NumPy array or matrix.");
-    }
- 	// Check dimensions
-    else if (array_numdims(in) != 1)
-    {
-      PyErr_SetString(PyExc_ValueError, "Wanted 1D Vector.");
-    }
-    else {
-    	size = array_size(in,0);
-    }
+    PyObject *inarray = PyArray_FROM_OTF(in, NPY_DOUBLE, NPY_IN_ARRAY);
+    if (inarray==NULL) std::cout << "ERROR: Conversion Failed." << std::endl;
 
-    // extract data
     PyArrayObject *temp=NULL;
-    if (PyArray_Check(in))
+    if (PyArray_Check(inarray))
     {
         int newobj;
-        temp = obj_to_array_allow_conversion(in, NPY_DOUBLE, &newobj);
+        temp = obj_to_array_allow_conversion(inarray, NPY_DOUBLE, &newobj);
+        size = array_size(temp,0);
     }
+  
     Eigen::VectorXd *out = new Eigen::VectorXd;
     (*out).resize(size);
     (*out).fill(0);
@@ -71,8 +62,6 @@ Eigen::VectorXd * ConvertNumpyToEigenVector(PyObject* in)
     for (long int i = 0; i != size; ++i){
         (*out)(i) = values[i];
     }
-    std::cout << "numpy to vector" << std::endl;
-    std::cout << *out << std::endl;
     return out;
 }
 
@@ -82,26 +71,17 @@ Eigen::MatrixXd * ConvertNumpyToEigenMatrix(PyObject* in)
     int rows = 0;
     int cols = 0;
      // check numpy array and get size
-    if (!is_array(in))
-    {
-      PyErr_SetString(PyExc_ValueError, "The given input is not known as a NumPy array or matrix.");
-    }
-    // Check dimensions
-    else if (array_numdims(in) != 2)
-    {
-      PyErr_SetString(PyExc_ValueError, "Wanted 2D Matrix.");
-    }
-    else {
-        rows = array_size(in,0);
-        cols = array_size(in,1);
-    }
+    PyObject *inarray = PyArray_FROM_OTF(in, NPY_DOUBLE, NPY_IN_ARRAY);
+    if (inarray==NULL) std::cout << "ERROR: Conversion Failed." << std::endl;
 
     // extract data
     PyArrayObject *temp=NULL;
-    if (PyArray_Check(in))
+    if (PyArray_Check(inarray))
     {
         int newobj;
-        temp = obj_to_array_allow_conversion(in, NPY_DOUBLE, &newobj);
+        temp = obj_to_array_allow_conversion(inarray, NPY_DOUBLE, &newobj);
+        rows = array_size(temp,0);
+        cols = array_size(temp,1);
     }
     Eigen::MatrixXd *out = new Eigen::MatrixXd;
     (*out).resize(rows,cols);
@@ -112,8 +92,6 @@ Eigen::MatrixXd * ConvertNumpyToEigenMatrix(PyObject* in)
             (*out)(i,j) = values[i*rows+j];
         }
     }
-    std::cout << "numpy to matrix" << std::endl;
-    std::cout << *out << std::endl;
     return out;
 
     }
