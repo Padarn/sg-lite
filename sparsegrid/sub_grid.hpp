@@ -73,6 +73,7 @@ typedef struct SubGrid
 	//                   corresponds to coefficients of the nodal basis
 	//
 	vector EvalPoints(matrix & data);
+	vector EvalPoints(std::string filename);
 
 
 } SubGrid;

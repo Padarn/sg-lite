@@ -30,6 +30,7 @@ void SubGrid::HatDataBin(std::string filename)
 
 void SubGrid::HatDataBin(const matrix & data)
 {
+
 	if (!isInitialised_) Initialize();
 	int ndata = data.rows();
 	ndata_ += ndata;
@@ -43,6 +44,10 @@ void SubGrid::HatDataBin(const matrix & data)
 		{
 			indexboundary(i) = 1; // dfixed vector
 			nboundary++;
+		}
+		else
+		{
+			indexboundary(i) = 0;
 		}
 	}
 	vector onevec(ndims_); onevec.fill(1.0);
@@ -99,6 +104,10 @@ void SubGrid::HaarDataBin(const matrix & data)
 			indexboundary(i) = 1; // dfixed vector
 			nboundary++;
 		}
+		else
+		{
+			indexboundary(i) = 0;
+		}
 	}
 	vector onevec(ndims_); onevec.fill(1.0);
 
@@ -132,6 +141,11 @@ void SubGrid::HaarDataBin(const matrix & data)
 
 } 
 
+vector SubGrid::EvalPoints(std::string filename)
+{
+	matrix data = read_csv_matrix(filename);
+	return EvalPoints(data);
+}
 
 vector SubGrid::EvalPoints(matrix & data)
 {
@@ -148,6 +162,10 @@ vector SubGrid::EvalPoints(matrix & data)
 		{
 			indexboundary(i) = 1; // dfixed vector
 			nboundary++;
+		}
+		else
+		{
+			indexboundary(i) = 0;
 		}
 	}
 	vector onevec(ndims_); onevec.fill(1.0);

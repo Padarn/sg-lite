@@ -153,10 +153,17 @@ Eigen::MatrixXd * ConvertNumpyToEigenMatrix(PyObject* in)
     ConvertEigenToNumpyMatrix(&$result, &$1);
 }
 
+// rename overloaded functions
+%rename("HatDataBin_File") HatDataBin(std::string filename);
+%rename("HaarDataBin_File") HaarDataBin(std::string filename);
+%rename("EvalPoints_File") EvalPoints(std::string filename);
+
 // Include the main header file with the typemaps defined
 #include <vector>
 %include "sparsegrid/regular_grid.hpp"
 %include "sparsegrid/combination_grid.hpp"
 %include "sparsegrid/sub_grid.hpp"
+
+
 
 

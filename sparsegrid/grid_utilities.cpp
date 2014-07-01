@@ -218,7 +218,7 @@ namespace gridutils {
 		for(int i=0; i<d; i++)
 		{
 			if (level(i)==0) index(i)=0;
-			else index(d)=floor(PowInt(2,level(i)-1) * x(i));
+			else index(i)=floor(PowInt(2,level(i)-1) * x(i));
 		}
 		return index;
 	}
