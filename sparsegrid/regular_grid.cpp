@@ -176,6 +176,61 @@ vector RegularGrid::EvalPoints(matrix & data)
 
 }
 
+vector RegularGrid::EvalPointsDerivative(matrix & data)
+{
+	// If uninitialized, assume constant.
+	if (!isInitialised_)
+	{
+		Initialize();
+		data_.fill(1.0);
+	}
+	vector result(data.rows());
+	result.fill(0);
+	int ndata = data.rows();
+
+	vector bit(ndims_);
+	vector fixed(ndims_);
+	vector relativeX(ndims_);
+	vector index(ndims_);
+	vector onevec(ndims_); onevec.fill(1.0);
+	int nfixed;
+	double value;
+	bool inDomain;
+
+	for(int i = 0; i < ndata; i++)
+	{
+		vector x = data.row(i);
+		vector corner = gridutils::CornerStrides(x, levels_, boundary_);
+
+		// get initial bit and fixed dimensions
+		bit.fill(0); fixed.fill(0); nfixed = 0;
+		inDomain = gridutils::BoundaryBitAndFixed(sizes_, corner, boundary_, 
+												  bit, fixed, nfixed);
+		value = 0;
+		// if x was in domain then it gives valid indicies so proceed
+		if (inDomain)
+		{
+			
+			int neighbours = gridutils::PowInt(2, ndims_ - nfixed);
+			for(int j = 0; j < neighbours; j++)
+			{
+				
+				index = bit+corner;
+				vector indexx = gridutils::IndexX(index, levels_, boundary_);
+				relativeX = gridutils::RelativeXScaled(x, index,
+													   levels_, boundary_);
+				double level_scale = pow(2,levels_.sum());
+				value += data_[strides_.dot(index)]*gridutils::HaarVal(relativeX)*level_scale;
+				gridutils::IncreaseBit(bit, onevec, fixed);
+
+			}
+		}
+		result(i)=value;
+	}
+	return result;
+
+}
+
 void RegularGrid::CollectCDF()
 {
 	data_ = data_.array()/ndata_;

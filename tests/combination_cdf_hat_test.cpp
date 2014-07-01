@@ -21,7 +21,7 @@ int main(){
 	//------------------
 	// Reading from file
 	matrix data;
-	data = read_csv_matrix("data/histsingle.csv");
+	data = read_csv_matrix("data/data_heat.csv");
 	//-----------------
 
 	int ndim = 2;

@@ -31,4 +31,14 @@ int main(){
 		std::cout << "level " << result->levels_[i].transpose() << " coef " << 
 		result->coefs_[i] << std::endl;
 	}
+	result->InitializeComponents();
+	result->HaarDataBin(data);
+	result->CollectCDF();
+
+	matrix grid = plottools::MeshGrid(32,ndim);
+	std::ofstream myfile;
+	myfile.open("result.txt");
+	myfile << result->EvalPointsDerivative(grid);
+	myfile.close();
+
 }

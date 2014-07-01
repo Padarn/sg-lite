@@ -21,22 +21,22 @@ int main(){
 	//------------------
 	// Reading from file
 	matrix data;
-	data = read_csv_matrix("data/histsingle.csv");
+	data = read_csv_matrix("data/data_heat.csv");
 	//-----------------
 
 	int ndim = 2;
 	bool full = true;
 
 	CombinationGrid a(ndim, full);
-	a.SetupStandardCombinationGrid(8);
+	a.SetupStandardCombinationGrid(6);
 
 	a.HaarDataBin(data);
 	a.CollectCDF();
 
-	matrix grid = plottools::MeshGrid(31,ndim);
+	matrix grid = plottools::MeshGrid(32,ndim);
 	std::ofstream myfile;
 	myfile.open("result.txt");
-	myfile << a.EvalPoints(grid);
+	myfile << a.EvalPointsDerivative(grid);
 	myfile.close();
 
 }

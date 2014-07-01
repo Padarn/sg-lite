@@ -141,3 +141,16 @@ vector CombinationGrid::EvalPoints(matrix data)
 	}
 	return result;
 }  
+
+vector CombinationGrid::EvalPointsDerivative(matrix data)
+{
+	if (!isInitialised_) InitializeComponents();
+	vector result(data.rows());
+	for(int i = 0; i < levels_.size(); i++)
+	{
+		RegularGrid * grid = grids_[i];
+		if (!grid->isInitialised_) grid->Initialize();
+		result += grid->EvalPointsDerivative(data) * coefs_[i];
+	}
+	return result;
+}  

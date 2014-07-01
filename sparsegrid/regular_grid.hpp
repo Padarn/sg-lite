@@ -89,6 +89,7 @@ typedef struct RegularGrid
 	//                   corresponds to coefficients of the nodal basis
 	//
 	vector EvalPoints(matrix & data);
+	vector EvalPointsDerivative(matrix & data);
 
 
 } RegularGrid ;

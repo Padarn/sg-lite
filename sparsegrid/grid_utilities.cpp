@@ -365,6 +365,7 @@ namespace gridutils {
 		int d = x.size();
 		for(int i=0; i<d;i++){
 			if (x(i)>0) val*=(-1);
+			if (x(i)==0 || x(i)==1 || x(i)==-1) return 0;
 		}
 		return val;	
 	}

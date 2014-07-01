@@ -78,6 +78,7 @@ typedef struct CombinationGrid
 	void CollectCDF();
 
 	vector EvalPoints(matrix data);
+	vector EvalPointsDerivative(matrix data);
 
 
 
