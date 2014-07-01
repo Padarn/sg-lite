@@ -101,12 +101,12 @@ void SubGrid::HaarDataBin(const matrix & data)
 	{
 		if (levels_(i)==0)
 		{
-			indexboundary(i) = 1; // dfixed vector
+			indexboundary(i) = 0; // dfixed vector
 			nboundary++;
 		}
 		else
 		{
-			indexboundary(i) = 0;
+			indexboundary(i) = 1;
 		}
 	}
 	vector onevec(ndims_); onevec.fill(1.0);

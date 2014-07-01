@@ -7,6 +7,7 @@ CombinationGrid::CombinationGrid(int ndims, bool boundary)
 	boundary_ = boundary;
 }
 
+
 CombinationGrid::~CombinationGrid()
 {
 	if (isInitialised_)

@@ -17,6 +17,9 @@
 #include <tr1/unordered_set> 
 #include "grid_operations.hpp"
 #include "grid_utilities.hpp"
+#include "combination_grid.hpp"
+#include "lattice_tools.hpp"
+#include "sub_grid.hpp"
 
 
 namespace std {
@@ -54,7 +57,7 @@ class compare_pair
 public:
   compare_pair(){};
   bool operator() (const vecpair& lhs, 
-  				    const vecpair&rhs) const
+  				    const vecpair& rhs) const
   {
     return (lhs.first<rhs.first);
   }
@@ -62,6 +65,7 @@ public:
 
 typedef struct AdaptiveGrid
 {
+	matrix data_;
 	int ndims_; 
 	bool boundary_;
 	std::tr1::unordered_set<vector> subgrid_levels_;
@@ -69,7 +73,10 @@ typedef struct AdaptiveGrid
 
 	AdaptiveGrid(int ndims, bool boundary);
 	~AdaptiveGrid(){};
-	void Initialize(){};
+	void Initialize();
+	void Refine();
+	double CDFPriority(vector level);
+	CombinationGrid * toCombination();
 
 } AdaptiveGrid ;
 
